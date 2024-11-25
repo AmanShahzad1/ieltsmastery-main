@@ -1,0 +1,358 @@
+/* Layout */
+.dashboardContainer {
+  display: flex;
+  height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.sidebar {
+  width: 16%;
+  background-color: #e8f1ff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Sidebar */
+.logoContainer {
+  text-align: center;
+  padding: 16px;
+}
+
+.logo {
+  width: 100%;
+}
+
+.navMenuHeading {
+  padding: 0 40px;
+  font-family: "Inria Serif", serif;
+}
+.navMenu {
+  padding: 0 40px 20px 40px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+  color: #555;
+  text-decoration: none;
+  font-size: 1rem;
+  font-family: "Inria Serif", serif;
+  transition: all 0.3s;
+}
+
+.navItem:hover {
+  color: #007bff;
+}
+
+.navIcon {
+  width: 24px;
+  margin-right: 12px;
+}
+
+.profile {
+  display: flex;
+  text-align: center;
+  padding: 20px 26px 60px 26px;
+  justify-content: space-between;
+}
+
+.profileImage {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.profileName {
+  font-weight: bold;
+  margin-top: 8px;
+  font-family: "Inria Serif", serif;
+}
+
+.profileEmail {
+  color: #999;
+  font-size: 0.875rem;
+  font-family: "Inria Serif", serif;
+}
+
+/* Main Content */
+.header {
+  margin: 0px 26px 26px;
+}
+
+.headerTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  font-family: "DM Serif Display", serif;
+}
+
+.contentLayout {
+  display: flex;
+  gap: 20px;
+}
+
+.leftContent {
+  flex: 3;
+}
+
+.activitySection {
+  flex: 1.5;
+}
+
+/* Card */
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  margin-bottom: 26px;
+  margin-left: 15px;
+}
+
+.cardTitle {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 2px;
+  font-family: "Inria Serif", serif;
+}
+
+.testCategories {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.testButton {
+  background-color: #e8f1ff;
+  color: #020202;
+  padding: 35px 8px;
+  margin: 12px;
+  border-radius: 4px;
+  font-size: 1.05rem;
+  text-align: center;
+  transition: all 0.3s;
+  font-family: "Inria Serif", serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.testButton:hover,
+.viewPastTests:hover {
+  background-color: #d0e9ff;
+}
+
+.viewPastTests {
+  margin: 16px 12px 12px;
+
+  background-color: #e8f1ff;
+  color: #020202;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 1.05rem;
+  display: inline-block;
+  text-align: center;
+  width: 98%;
+  font-family: "Inria Serif", serif;
+}
+
+/* Overview Section */
+
+.barChartContainer {
+  display: flex;
+  height: 200px; /* Define a fixed height */
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.barChart {
+  margin-left: 50px;
+  display: flex;
+  align-items: flex-end; /* Align bars to the bottom */
+  /* justify-content: space-between; */
+  height: 100%; /* Ensure the bars take the full height of the container */
+  width: 100%;
+  gap: 50px;
+  margin: 20px;
+}
+
+.barWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%; /* Full height relative to barChart */
+}
+
+.bar {
+  width: 32px;
+  background: linear-gradient(180deg, #01438a, #03036D);
+  border-radius: 20px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 10px 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.barLabel {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 15px;
+  font-family: "Inria Serif", serif;
+}
+.yAxis {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+  height:100%;
+  font-size: 0.75rem;
+  color: #666;
+  gap: 22px;
+  font-family: "Inria Serif", serif;
+}
+
+.bar:hover {
+  transform: scale(1.1);
+}
+
+
+.cardSubtitle {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 8px;
+  font-family: "Inria Serif", serif;
+}
+
+
+
+/* Activity Section */
+.activityCircles {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin-top: 16px;
+  height: 160px; /* Adjusted height for proper alignment */
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color: white;
+  /* font-weight: bold; */
+  text-align: center;
+  line-height: 1.2;
+  position: absolute;
+  font-family: "Inria Serif", serif;
+  font-size: 17px;
+ 
+}
+
+.largeCircle {
+  width: 150px;
+  height: 150px;
+  background-color: #03036D; /* Blue */
+  top: 0em;
+  left: 7em;
+  box-shadow: 15px 10px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mediumCircle {
+  width: 130px;
+  height: 130px;
+  background-color: #f0f0f0; /* Light Gray */
+  color: #333;
+  top: 5.5em;
+  left: 4em;
+  box-shadow: 10px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.smallCircle {
+  width: 95px;
+  height: 95px;
+  background-color: #555555; /* Dark Gray */
+  top: 10em;
+  left: 160px;
+  box-shadow: 10px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Comparison Section */
+.comparisonSection {
+  margin-top: 120px; /* Adjusted for overlap */
+  text-align: left;
+  padding: 10px 16px;
+  font-family: "Inria Serif", serif;
+}
+
+.comparisonRow{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px;
+}
+
+.comparisonTitle{
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.progressBar {
+  width: 65%; /* Adjusted width to match design */
+  height: 14px;
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 10px 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.lastWeek {
+  width: 60%;
+  background-color: #001f7f;
+}
+
+.thisWeek {
+  width: 80%;
+  background-color: #555555;
+}
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .contentLayout {
+    flex-direction: column;
+  }
+}
