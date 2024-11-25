@@ -1,7 +1,9 @@
 import { MdFacebook } from "react-icons/md";
 import { FaApple } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
+import Dashboard from "../dashboard/page";
 import Image from "next/image";
+import Link from "next/link";
 export default function LoginPage() {
   return (
     <div className="min-h-screen w-full  flex items-center justify-center bg-blue-50">
@@ -37,13 +39,13 @@ export default function LoginPage() {
               </span>
             </div>
             <button className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:opacity-90">
-              Login to Your Account →
+              <Link href="./dashboard">Login to Your Account →</Link>
             </button>
             <p className="mt-4 text-sm text-gray-700">
               Don’t have an account yet?{" "}
-              <a href="#" className="text-blue-600 font-semibold">
-                Register now!
-              </a>
+              <Link href="./register" className="text-blue-600 font-semibold">Register now!</Link>
+                
+            
             </p>
           </div>
 
