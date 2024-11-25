@@ -1,18 +1,16 @@
-import Image from "next/image";
-import Dashboard from "./pages/Dashboard/dashboard";
+import Link from "next/link";
+import Dashboard from "./pages/dashboard/page";
 import LoginPage from "./pages/login/page";
-import RegisterPage from "./pages/login/register/page";
-
+import RegisterPage from "./pages/register/page";
 
 export default function Home() {
   return (
     <main>
-      <a href="/pages/login">login</a>
-     {/* <LoginPage/>
-     <RegisterPage/> */}
-      <a href="/pages/login/register">register</a>
+      <Link href="/pages/login">Login</Link>
+      {/* <LoginPage />
+      <RegisterPage /> */}
+      <Link href="/pages/login/register">Register</Link>
       <Dashboard />
     </main>
   );
 }
-
