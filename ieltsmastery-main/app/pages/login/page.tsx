@@ -1,18 +1,67 @@
+"use client";
+import { useState } from "react";
 import { MdFacebook } from "react-icons/md";
 import { FaApple } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
-import Dashboard from "../dashboard/page";
 import Image from "next/image";
 import Link from "next/link";
+
 export default function LoginPage() {
+  const [formData, setFormData] = useState({
+    email_or_phone: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email_or_phone: formData.email_or_phone,
+          password: formData.password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSuccess("Login successful!");
+        setError("");
+        // You would ideally store the JWT token in localStorage or cookies
+        localStorage.setItem("token", data.token);
+        window.location.href = "/pages/dashboard"; // Redirect to the dashboard page
+      } else {
+        const data = await response.json();
+        setError(data.message || "Login failed.");
+        setSuccess("");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setSuccess("");
+      console.error("Login error:", err);
+    }
+  };
+
   return (
-    <div className="min-h-screen w-full  flex items-center justify-center bg-blue-50">
+    <div className="min-h-screen w-full flex items-center justify-center bg-blue-50">
       <div className="bg-white shadow-lg rounded-lg p-10 max-w-4xl w-full">
         {/* Header Section */}
         <div className="text-center mb-6">
-            
           <img
-            src='/Logo.png'
+            src="/Logo.png"
             alt="IELTS Mastery Logo"
             className="mx-auto w-20"
           />
@@ -23,29 +72,42 @@ export default function LoginPage() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Section */}
           <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Email / Phone number"
-              className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <div className="relative">
+            <form onSubmit={handleSubmit}>
               <input
-                type="password"
-                placeholder="Password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="text"
+                name="email_or_phone"
+                value={formData.email_or_phone}
+                onChange={handleChange}
+                placeholder="Email / Phone number"
+                className="w-full mb-4 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer">
-                👁️
-              </span>
-            </div>
-            <button className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:opacity-90">
-              <Link href="./dashboard">Login to Your Account →</Link>
-            </button>
+              <div className="relative">
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer">
+                  👁️
+                </span>
+              </div>
+              <button
+                type="submit"
+                className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:opacity-90"
+              >
+                Login to Your Account →
+              </button>
+            </form>
+            {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+            {success && <p className="mt-4 text-sm text-green-600">{success}</p>}
             <p className="mt-4 text-sm text-gray-700">
               Don’t have an account yet?{" "}
-              <Link href="./register" className="text-blue-600 font-semibold">Register now!</Link>
-                
-            
+              <Link href="./register" className="text-blue-600 font-semibold">
+                Register now!
+              </Link>
             </p>
           </div>
 
@@ -55,21 +117,20 @@ export default function LoginPage() {
           </div>
 
           {/* Right Section */}
-          <div className="flex-1 flex flex-col gap-3">
+          <div className="flex-1 flex flex-col gap-4">
             <button className="flex items-center justify-center border border-blue-500 text-blue-500 px-4 py-3 rounded-lg hover:bg-blue-50">
-              <FaGoogle size={24} color="blue"/>
+              <FaGoogle size={24} color="blue" />
               <span className="ml-2">Log in with Google</span>
             </button>
             <button className="flex items-center justify-center border border-blue-700 text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50">
-              <MdFacebook size={24} color="blue"/>
+              <MdFacebook size={24} color="blue" />
               <span className="ml-2">Log in with Facebook</span>
             </button>
             <button className="flex items-center justify-center border border-black text-black px-4 py-3 rounded-lg hover:bg-gray-100">
-              <FaApple size={24} color="black"/>
+              <FaApple size={24} color="black" />
               <span className="ml-2">Log in with Apple Account</span>
             </button>
           </div>
-
         </div>
 
         {/* Footer */}
