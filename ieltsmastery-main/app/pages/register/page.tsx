@@ -3,10 +3,17 @@ import { useState } from "react";
 import { MdFacebook } from "react-icons/md";
 import { FaApple, FaGoogle } from "react-icons/fa";
 import Link from "next/link";
+import { registerUser } from "@/api/auth"; // Import the registerUser function
+
+type FormData = {
+  username: string;
+  email_or_phone: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export default function RegisterPage() {
-  // State to manage form data and messages
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     email_or_phone: "",
     password: "",
@@ -14,53 +21,100 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Function to handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setError(""); // Clear errors on input change
+    setSuccess(""); // Clear success message
   };
 
-  // Function to handle form submission
+  const isValidEmail = (value: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  };
+  
+  const isValidPhone = (value: string): boolean => {
+    const phoneRegex = /^0?[1-9]\d{9,14}$/; // Ensures 10–15 digits, optional leading `0`
+    return phoneRegex.test(value);
+  };
+  
+  const isValidPassword = (value: string): boolean => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    return passwordRegex.test(value);
+  };
+  
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Validate password match
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      setSuccess("");
+    if (isSubmitting) return;
+  
+    // Username validation
+    if (!formData.username || formData.username.length < 3) {
+      setError("Username must be at least 3 characters long.");
+      document.querySelector<HTMLInputElement>('input[name="username"]')?.focus();
       return;
     }
-
+  
+    // Email or phone validation
+    if (!formData.email_or_phone) {
+      setError("Please enter an email or phone number.");
+      document.querySelector<HTMLInputElement>('input[name="email_or_phone"]')?.focus();
+      return;
+    }
+  
+    const input = formData.email_or_phone;
+    const isEmailValid = isValidEmail(input);
+    const isPhoneValid = isValidPhone(input);
+  
+    if (!isEmailValid && !isPhoneValid) {
+      setError("Please enter a valid email address or phone number.");
+      document.querySelector<HTMLInputElement>('input[name="email_or_phone"]')?.focus();
+      return;
+    }
+  
+    // Password validation
+    if (!isValidPassword(formData.password)) {
+      setError(
+        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+      );
+      document.querySelector<HTMLInputElement>('input[name="password"]')?.focus();
+      return;
+    }
+  
+    // Confirm password validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      document.querySelector<HTMLInputElement>('input[name="confirmPassword"]')?.focus();
+      return;
+    }
+  
+    // If all validations pass
+    setIsSubmitting(true);
+    setError("");
+    setSuccess("");
+  
     try {
-      // Call the register API
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email_or_phone: formData.email_or_phone,
-          password: formData.password,
-        }),
+      await registerUser({
+        username: formData.username,
+        email_or_phone: formData.email_or_phone,
+        password: formData.password,
       });
-
-      if (response.ok) {
-        setSuccess("Registration successful!");
-        setError("");
+      setSuccess("Registration successful!");
+    } catch (err: unknown) {
+      if (typeof err === "string") {
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err.message);
       } else {
-        const data = await response.json();
-        setError(data.message || "Registration failed.");
-        setSuccess("");
+        setError("An unknown error occurred.");
       }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-      setSuccess("");
-      console.error("Registration error:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen w-full bg-blue-50 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-10 max-w-4xl w-full">
@@ -112,9 +166,10 @@ export default function RegisterPage() {
             />
             <button
               type="submit"
-              className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:opacity-90"
+              className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
             >
-              Register →
+              {isSubmitting ? "Registering..." : "Register →"}
             </button>
             {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
             {success && <p className="mt-4 text-sm text-green-600">{success}</p>}
