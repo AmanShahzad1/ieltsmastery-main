@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
       setSuccess(data.message); // Use the backend-provided success message
       setError("");
       localStorage.setItem("adminToken", data.token);
-      window.location.href = "/pages/Admin"; // Redirect to the admin dashboard
+      window.location.href = "/admin/home"; // Redirect to the admin dashboard
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message); // Use the backend-provided error message
