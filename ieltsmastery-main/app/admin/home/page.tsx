@@ -46,7 +46,7 @@ export default function AdminDashboard() {
         {/* Manage Reading Test */}
         <div
           className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
-          onClick={() => navigateTo("/pages/Admins_Reading_test")}
+          onClick={() => navigateTo("/admin/tests/reading/main")}
         >
           <Image
             src="/icons/reading.png"

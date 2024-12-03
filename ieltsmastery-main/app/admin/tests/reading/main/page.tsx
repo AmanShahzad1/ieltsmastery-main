@@ -1,9 +1,11 @@
 "use client"; // Mark the component as a client component
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
 export default function ReadingTestsPage() {
   const [tests, setTests] = useState(["Reading Test 1", "Reading Test 2"]);
+  const router = useRouter(); // Initialize the router instance
 
   const handleCreateTest = () => {
     const nextTestNumber = tests.length + 1;
@@ -38,7 +40,10 @@ export default function ReadingTestsPage() {
               className="flex justify-between items-center p-4 border border-gray-300 rounded-md bg-gray-50"
             >
               <span className="text-lg">{test}</span>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+              <button
+                onClick={() => router.push("/admin/tests/reading/readingTest")} // Navigate to the static page
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
                 View Test
               </button>
             </div>
