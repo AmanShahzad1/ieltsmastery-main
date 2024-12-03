@@ -41,12 +41,7 @@ export default function AdminReadingPage() {
         <div className="w-full sm:w-1/2 flex flex-col space-y-6 pr-8">
           {/* Questions Section */}
           <div className="bg-white shadow-md rounded-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">Questions (1 to 10)</h3>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-                Upload Content
-              </button>
-            </div>
+            <h3 className="text-lg font-bold mb-4">Questions (1 to 10)</h3>
             <div className="space-y-6">
               {Array.from({ length: 10 }).map((_, index) => (
                 <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -75,11 +70,20 @@ export default function AdminReadingPage() {
               className="border border-gray-300 rounded-md p-4 w-full h-60 resize-none"
               placeholder="Enter the reading material here..."
             ></textarea>
-            <button className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
-              Input Content
-            </button>
           </div>
         </div>
+      </div>
+
+      {/* Centralized Upload Test Button */}
+      <div className="flex justify-center mt-8">
+        <button
+          className="px-6 py-3 text-white text-lg font-bold rounded-md"
+          style={{
+            backgroundColor: "#5A2D81", // Purple color from the logo
+          }}
+        >
+          Upload Test (Test No: 1)
+        </button>
       </div>
     </div>
   );
