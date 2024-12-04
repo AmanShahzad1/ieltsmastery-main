@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function readingTest() {
+export default function Home() {
   // State to toggle question blur
   const [isBlurred, setIsBlurred] = useState(true);
 
@@ -9,26 +9,38 @@ export default function readingTest() {
   const [time, setTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
-  // Create an Audio instance
-  const audio = new Audio("start audio.wav"); // Replace with your audio file path
+  // State to hold the audio instance (client-side only)
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   // Timer logic
   useEffect(() => {
-    let timer: ReturnType<typeof setInterval>; // Explicitly type the timer variable
+    let timer: NodeJS.Timeout | null = null;
     if (isTimerRunning) {
       timer = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
       }, 1000);
     }
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [isTimerRunning]);
 
+  // Create Audio instance when the component is mounted (client-side)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const audioInstance = new Audio("/audio/start_audio.wav"); // Path to your audio file
+      setAudio(audioInstance);
+    }
+  }, []);
+
   const startTest = () => {
-    audio.play();
-    audio.addEventListener("ended", () => {
-      setIsBlurred(false);
-      setIsTimerRunning(true);
-    });
+    if (audio) {
+      audio.play();
+      audio.addEventListener("ended", () => {
+        setIsBlurred(false);
+        setIsTimerRunning(true);
+      });
+    }
   };
 
   return (
@@ -69,13 +81,15 @@ export default function readingTest() {
         <div className="bg-white shadow-md rounded-md p-6 w-full lg:w-1/2">
           <h3 className="text-lg font-bold mb-4">Reading Material</h3>
           <div className="space-y-4">
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book.
-            </p>
-            {/* Additional content */}
+            {/* Repeated content */}
+            {[...Array(8)].map((_, index) => (
+              <p key={index} className="text-sm text-gray-600 leading-relaxed">
+                Lorem Ipsum is simply dummy text of the printing and typesetting
+                industry. Lorem Ipsum has been the industry's standard dummy text
+                ever since the 1500s, when an unknown printer took a galley of
+                type and scrambled it to make a type specimen book.
+              </p>
+            ))}
           </div>
         </div>
 
