@@ -1,15 +1,47 @@
 "use client"; // Mark the component as a client component
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchTests, createTest } from "../../../../../api/tests"; // Import API functions
+
+// Define the structure of a test object
+interface Test {
+  id: number;
+  name: string;
+}
 
 export default function ReadingTestsPage() {
-  const [tests, setTests] = useState(["Reading Test 1", "Reading Test 2"]);
+  const [tests, setTests] = useState<Test[]>([]); // Set initial state as an empty array of Test type
   const router = useRouter(); // Initialize the router instance
 
-  const handleCreateTest = () => {
-    const nextTestNumber = tests.length + 1;
-    setTests([...tests, `Reading Test ${nextTestNumber}`]);
+  // Fetch the list of tests from the backend
+  const getTests = async () => {
+    try {
+      const fetchedTests = await fetchTests(); // Fetch tests from the API
+      setTests(fetchedTests); // Store fetched tests in the state
+    } catch (error) {
+      console.error("Error fetching tests:", error);
+    }
+  };
+
+  // Fetch tests when the component mounts
+  useEffect(() => {
+    getTests();
+  }, []);
+
+  // Handle the creation of a new test
+  const handleCreateTest = async () => {
+    try {
+      const newTest = await createTest(`Reading Test ${tests.length + 1}`); // Create new test
+      if (newTest && newTest.id && newTest.name) {
+        // Ensure the new test has the correct structure
+        setTests((prevTests) => [...prevTests, newTest]); // Add the newly created test to the state
+      } else {
+        console.error("Invalid test structure returned", newTest);
+      }
+    } catch (error) {
+      console.error("Error creating test:", error);
+    }
   };
 
   return (
@@ -34,14 +66,16 @@ export default function ReadingTestsPage() {
 
         {/* List of Reading Tests */}
         <div className="space-y-4">
-          {tests.map((test, index) => (
+          {tests.map((test) => (
             <div
-              key={index}
+              key={test.id}
               className="flex justify-between items-center p-4 border border-gray-300 rounded-md bg-gray-50"
             >
-              <span className="text-lg">{test}</span>
+              <span className="text-lg">{test.name}</span>
               <button
-                onClick={() => router.push("/admin/tests/reading/readingTest")} // Navigate to the static page
+                onClick={() =>
+                  router.push(`/admin/tests/reading/readingTest`) // Navigate to the specific test edit page
+                }
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               >
                 View Test
