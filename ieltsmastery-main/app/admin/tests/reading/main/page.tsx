@@ -1,8 +1,8 @@
 "use client"; // Mark the component as a client component
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { fetchTests, createTest } from "../../../../../api/tests"; // Import API functions
+import Link from "next/link"; // Use next/link for client-side navigation
 
 // Define the structure of a test object
 interface Test {
@@ -12,7 +12,6 @@ interface Test {
 
 export default function ReadingTestsPage() {
   const [tests, setTests] = useState<Test[]>([]); // Set initial state as an empty array of Test type
-  const router = useRouter(); // Initialize the router instance
 
   // Fetch the list of tests from the backend
   const getTests = async () => {
@@ -72,14 +71,16 @@ export default function ReadingTestsPage() {
               className="flex justify-between items-center p-4 border border-gray-300 rounded-md bg-gray-50"
             >
               <span className="text-lg">{test.name}</span>
-              <button
-                onClick={() =>
-                  router.push(`/admin/tests/reading/readingTest`) // Navigate to the specific test edit page
-                }
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              <Link
+                href={{
+                  pathname: "/admin/tests/reading/readingTest",
+                  query: { testId: test.id.toString() }, // Pass testId as a query parameter
+                }}
               >
-                View Test
-              </button>
+                <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                  View Test
+                </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -88,10 +89,17 @@ export default function ReadingTestsPage() {
         <div className="flex justify-center mt-8">
           <button
             onClick={handleCreateTest}
-            className="px-6 py-3 bg-purple-600 text-white text-lg font-bold rounded-md hover:bg-purple-700"
+            className="px-6 py-3 bg-[#03036D] text-white text-lg font-bold rounded-md hover:bg-[#020258]"
           >
             Create Test
           </button>
+        </div>
+
+        {/* Back Button */}
+        <div className="flex justify-center mt-8">
+          <Link href="/admin/home" className="px-6 py-3 bg-gray-500 text-white text-lg font-bold rounded-md hover:bg-gray-600">
+              Go Back
+          </Link>
         </div>
       </div>
     </div>
