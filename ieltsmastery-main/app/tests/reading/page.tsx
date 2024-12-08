@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-
+import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 export default function Home() {
   // State to toggle question blur
   const [isBlurred, setIsBlurred] = useState(true);
@@ -44,6 +44,8 @@ export default function Home() {
   };
 
   return (
+    <>
+    <ProtectedRoute>
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       {/* Header */}
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
@@ -125,5 +127,7 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
+    </>
   );
 }

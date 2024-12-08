@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation"; // Use the App Router's navigation
 import styles from "./dashboard.module.css";
-
+import ProtectedRoute from "../RouteProtected/RouteProtected";
 const Dashboard: React.FC = () => {
   const router = useRouter();
 
@@ -30,6 +30,8 @@ const Dashboard: React.FC = () => {
   };
 
   return (
+    <>
+    <ProtectedRoute>
     <div className={styles.dashboardContainer}>
       {/* Sidebar */}
       <aside className={styles.sidebar}>
@@ -197,6 +199,9 @@ const Dashboard: React.FC = () => {
         </div>
       </main>
     </div>
+    </ProtectedRoute>
+    </>
+    
   );
 };
 
