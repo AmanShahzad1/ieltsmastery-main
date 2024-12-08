@@ -1,9 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "../../../utils/AdminAuth";
 
-const AdminProtectedRoute = ({ children }) => {
+interface AdminProtectedRouteProps {
+  children: ReactNode; // Specify the type of children
+}
+
+const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -19,7 +23,7 @@ const AdminProtectedRoute = ({ children }) => {
     return <p>Loading...</p>; // Optional loading message or spinner
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 export default AdminProtectedRoute;

@@ -66,12 +66,7 @@ export default function AdminLoginPage() {
         </form>
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
         {success && <p className="mt-4 text-sm text-green-600">{success}</p>}
-        <p className="mt-4 text-sm text-gray-700">
-          Return to{" "}
-          <Link href="/" className="text-blue-600 font-semibold">
-            Home
-          </Link>
-        </p>
+        
       </div>
     </div>
   );

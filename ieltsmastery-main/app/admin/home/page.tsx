@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import AdminProtectedRoute from "@/app/pages/RouteProtected/adminRouteProtected";
+import AdminProtectedRoute from "../../pages/RouteProtected/adminRouteProtected";
 export default function AdminDashboard() {
   const router = useRouter();
 
