@@ -38,8 +38,7 @@ export default function Home() {
             <nav className="hidden lg:flex space-x-6">
               <a href="#features" className="text-gray-700 hover:text-[#03036D]">Features</a>
               <a href="#about" className="text-gray-700 hover:text-[#03036D]">About Us</a>
-              <a href="#testimonials" className="text-gray-700 hover:text-[#03036D]">Testimonials</a>
-              <a href="#contact" className="text-gray-700 hover:text-[#03036D]">Contact</a>
+              
             </nav>
             <Link
               href="/pages/login"
