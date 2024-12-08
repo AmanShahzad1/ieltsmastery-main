@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
     { name: "Subscriptions", icon: "/icons/refund-alt.png" },
     {
       name: "Logout",
-      icon: "/icons/refund-alt.png",
+      icon: "/icons/logout.png",
       action: handleLogout,
       isButton: true, // Add flag to identify it as a button
     },
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
     <div key={index} className={styles.navItemWrapper}>
       {item.isButton ? (
         <button
-          className={styles.navItemButton}
+          className={`${styles.navItem} ${styles.navItemButton}`}  // Ensure it's consistent
           onClick={item.action} // Call the action when clicked
         >
           <img
@@ -93,6 +93,7 @@ const Dashboard: React.FC = () => {
     </div>
   ))}
 </nav>
+
 
 
         <div className={styles.profile}>

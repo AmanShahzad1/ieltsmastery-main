@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import './styles/global.css';
 import Head from "next/head";
 import Link from "next/link";
+
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
