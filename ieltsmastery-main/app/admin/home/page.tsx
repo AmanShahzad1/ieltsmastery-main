@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-
+import AdminProtectedRoute from "@/app/pages/RouteProtected/adminRouteProtected";
 export default function AdminDashboard() {
   const router = useRouter();
 
@@ -12,6 +12,8 @@ export default function AdminDashboard() {
   };
 
   return (
+    <>
+    <AdminProtectedRoute>
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-[#03036D] text-white p-6 shadow-lg">
@@ -116,5 +118,7 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
+    </AdminProtectedRoute>
+    </>
   );
 }

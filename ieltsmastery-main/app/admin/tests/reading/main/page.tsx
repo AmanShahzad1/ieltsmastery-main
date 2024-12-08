@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchTests, createTest } from "../../../../../api/tests"; // Import API functions
 import Link from "next/link"; // Use next/link for client-side navigation
-
 // Define the structure of a test object
 interface Test {
   id: number;
