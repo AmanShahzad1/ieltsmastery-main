@@ -1,7 +1,12 @@
+"use client"; // Ensure this is a client component
+
 import React from "react";
+import { useRouter } from "next/navigation"; // Use the App Router's navigation
 import styles from "./dashboard.module.css";
 
 const Dashboard: React.FC = () => {
+  const router = useRouter();
+
   const barData = [
     { date: "14, Jan", value: 44 },
     { date: "21, Jan", value: 50 },
@@ -13,7 +18,16 @@ const Dashboard: React.FC = () => {
     { date: "2, May", value: 90 },
   ];
 
-  const testCategories = ["Listening", "Reading", "Writing", "Speaking"];
+  const testCategories = [
+    { name: "Listening", route: "/tests/listening" },
+    { name: "Reading", route: "/tests/reading" },
+    { name: "Writing", route: "/tests/writing" },
+    { name: "Speaking", route: "/tests/speaking" },
+  ];
+
+  const handleNavigation = (route: string) => {
+    router.push(route); // Navigate to the desired route
+  };
 
   return (
     <div className={styles.dashboardContainer}>
@@ -73,33 +87,24 @@ const Dashboard: React.FC = () => {
           {/* Left Content */}
           <div className={styles.leftContent}>
             {/* Today's Tests */}
-            {/* <section className={styles.card}>
-              <h2 className={styles.cardTitle}>Today's Tests</h2>
-              <p className={styles.cardSubtitle}>(11/11/2024)</p>
-              <div className={styles.testCategories}>
-                {testCategories.map((test, index) => (
-                  <button key={index} className={styles.testButton}>
-                    {test}
-                  </button>
-                ))}
-              </div>
-              <button className={styles.viewPastTests}>View Past Tests</button>
-            </section> */}
-            {/* Today's Tests */}
             <section className={styles.card}>
               <h2 className={styles.cardTitle}>Today's Tests</h2>
               <p className={styles.cardSubtitle}>(11/11/2024)</p>
               <div className={styles.testCategories}>
                 {testCategories.map((test, index) => (
-                  <button key={index} className={styles.testButton}>
+                  <button
+                    key={index}
+                    className={styles.testButton}
+                    onClick={() => handleNavigation(test.route)}
+                  >
                     <img
-                      src={`/icons/${test
+                      src={`/icons/${test.name
                         .toLowerCase()
                         .replace(/\s+/g, "-")}.png`}
-                      alt={`${test} icon`}
+                      alt={`${test.name} icon`}
                       className={styles.icon}
                     />
-                    {test}
+                    {test.name}
                   </button>
                 ))}
               </div>

@@ -1,7 +1,16 @@
-import Image from 'next/image';
+"use client"; // Ensures this component is a Client Component
+import Image from "next/image";
 import { FaRegUserCircle } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+
+  // Helper function for navigation
+  const navigateTo = (path: string) => {
+    router.push(path);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -13,12 +22,20 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Users Management */}
-        <div className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300">
+        <div
+          className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
+          onClick={() => navigateTo("/admin/users")}
+        >
           <div
             className="mx-auto flex items-center justify-center"
-            style={{ width: 100, height: 100, backgroundColor: '#03036D', borderRadius: '50%' }}
+            style={{
+              width: 100,
+              height: 100,
+              backgroundColor: "#03036D",
+              borderRadius: "50%",
+            }}
           >
-            <FaRegUserCircle style={{ color: 'white', width: 60, height: 60 }} />
+            <FaRegUserCircle style={{ color: "white", width: 60, height: 60 }} />
           </div>
           <h2 className="text-xl font-bold text-center mt-3 text-gray-800">Users Management</h2>
           <p className="text-gray-600 text-center">
@@ -27,7 +44,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Manage Reading Test */}
-        <div className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300">
+        <div
+          className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
+          onClick={() => navigateTo("/admin/tests/reading/main")}
+        >
           <Image
             src="/icons/reading.png"
             alt="Manage Reading Test"
@@ -42,7 +62,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Manage Speaking Test */}
-        <div className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300">
+        <div
+          className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
+          onClick={() => navigateTo("/admin/tests/speaking")}
+        >
           <Image
             src="/icons/speaking.png"
             alt="Manage Speaking Test"
@@ -57,7 +80,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Manage Listening Test */}
-        <div className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300">
+        <div
+          className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
+          onClick={() => navigateTo("/admin/tests/listening")}
+        >
           <Image
             src="/icons/listening.png"
             alt="Manage Listening Test"
@@ -72,7 +98,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Manage Writing Test */}
-        <div className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300">
+        <div
+          className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
+          onClick={() => navigateTo("/admin/tests/writing")}
+        >
           <Image
             src="/icons/writing.png"
             alt="Manage Writing Test"
