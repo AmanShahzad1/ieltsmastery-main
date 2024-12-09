@@ -3,10 +3,15 @@
 import React from "react";
 import { useRouter } from "next/navigation"; // Use the App Router's navigation
 import styles from "./dashboard.module.css";
-
+import ProtectedRoute from "../RouteProtected/RouteProtected";
 const Dashboard: React.FC = () => {
   const router = useRouter();
-
+ const handleLogout=()=>{
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("token");
+  }
+  router.push("/pages/login")
+ }
   const barData = [
     { date: "14, Jan", value: 44 },
     { date: "21, Jan", value: 50 },
@@ -30,6 +35,8 @@ const Dashboard: React.FC = () => {
   };
 
   return (
+    <>
+    <ProtectedRoute>
     <div className={styles.dashboardContainer}>
       {/* Sidebar */}
       <aside className={styles.sidebar}>
@@ -47,23 +54,48 @@ const Dashboard: React.FC = () => {
         </nav>
 
         <nav className={styles.navMenu}>
-          {[
-            { name: "Dashboard", icon: "/icons/category.png" },
-            { name: "Analytics", icon: "/icons/stats.png" },
-            { name: "Notifications", icon: "/icons/bell.png" },
-            { name: "Study Material", icon: "/icons/books.png" },
-            { name: "Subscriptions", icon: "/icons/refund-alt.png" },
-          ].map((item, index) => (
-            <a key={index} href="#" className={styles.navItem}>
-              <img
-                src={item.icon}
-                alt={`${item.name} Icon`}
-                className={styles.navIcon}
-              />
-              {item.name}
-            </a>
-          ))}
-        </nav>
+  {[
+    { name: "Dashboard", icon: "/icons/category.png" },
+    { name: "Analytics", icon: "/icons/stats.png" },
+    { name: "Notifications", icon: "/icons/bell.png" },
+    { name: "Study Material", icon: "/icons/books.png" },
+    { name: "Subscriptions", icon: "/icons/refund-alt.png" },
+    {
+      name: "Logout",
+      icon: "/icons/logout.png",
+      action: handleLogout,
+      isButton: true, // Add flag to identify it as a button
+    },
+  ].map((item, index) => (
+    <div key={index} className={styles.navItemWrapper}>
+      {item.isButton ? (
+        <button
+          className={`${styles.navItem} ${styles.navItemButton}`}  // Ensure it's consistent
+          onClick={item.action} // Call the action when clicked
+        >
+          <img
+            src={item.icon}
+            alt={`${item.name} Icon`}
+            className={styles.navIcon}
+          />
+          {item.name}
+        </button>
+      ) : (
+        <a href="#" className={styles.navItem}>
+          <img
+            src={item.icon}
+            alt={`${item.name} Icon`}
+            className={styles.navIcon}
+          />
+          {item.name}
+        </a>
+      )}
+    </div>
+  ))}
+</nav>
+
+
+
         <div className={styles.profile}>
           <img
             src="/profile.jpg"
@@ -197,6 +229,9 @@ const Dashboard: React.FC = () => {
         </div>
       </main>
     </div>
+    </ProtectedRoute>
+    </>
+    
   );
 };
 

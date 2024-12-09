@@ -196,10 +196,7 @@ export default function RegisterPage() {
               <MdFacebook size={24} color="blue" />
               <span className="ml-2">Log In with Facebook</span>
             </button>
-            <button className="flex items-center justify-center border border-black text-black px-4 py-3 rounded-lg hover:bg-gray-100">
-              <FaApple size={24} color="black" />
-              <span className="ml-2">Log In with Apple Account</span>
-            </button>
+           
           </div>
         </form>
 
@@ -208,10 +205,8 @@ export default function RegisterPage() {
           <a href="#" className="hover:underline">
             Privacy Policy
           </a>
-          <a href="#" className="hover:underline">
-            Forgot Password?
-          </a>
-          <span>Copyright @aaaa 2024</span>
+          
+          <span>Copyright @IELTS Mastery 2024</span>
         </div>
       </div>
     </div>

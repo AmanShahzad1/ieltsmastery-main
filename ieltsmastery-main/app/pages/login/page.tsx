@@ -117,7 +117,7 @@ export default function LoginPage() {
           </div>
 
           {/* Right Section */}
-          <div className="flex-1 flex flex-col gap-4">
+          <div className="flex-1 flex flex-col gap-4 justify-center">
             <button className="flex items-center justify-center border border-blue-500 text-blue-500 px-4 py-3 rounded-lg hover:bg-blue-50">
               <FaGoogle size={24} color="blue" />
               <span className="ml-2">Log in with Google</span>
@@ -126,10 +126,7 @@ export default function LoginPage() {
               <MdFacebook size={24} color="blue" />
               <span className="ml-2">Log in with Facebook</span>
             </button>
-            <button className="flex items-center justify-center border border-black text-black px-4 py-3 rounded-lg hover:bg-gray-100">
-              <FaApple size={24} color="black" />
-              <span className="ml-2">Log in with Apple Account</span>
-            </button>
+           
           </div>
         </div>
 
@@ -138,10 +135,8 @@ export default function LoginPage() {
           <a href="#" className="hover:underline">
             Privacy Policy
           </a>
-          <a href="#" className="hover:underline">
-            Forgot Password?
-          </a>
-          <span>Copyright @aaaa 2023</span>
+          
+          <span>Copyright @IELTS Mastery 2024</span>
         </div>
       </div>
     </div>
