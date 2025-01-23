@@ -5,6 +5,8 @@ import { FaApple } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/dist/server/api-utils";
+// import { useRouter } from 'next/router';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -19,6 +21,13 @@ export default function LoginPage() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  
+  const handleGoogleLogin =()=>{
+    window.location.href = 'http://localhost:5000/auth/google';
+  }
+
+  
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -117,16 +126,25 @@ export default function LoginPage() {
           </div>
 
           {/* Right Section */}
-          <div className="flex-1 flex flex-col gap-4 justify-center">
-            <button className="flex items-center justify-center border border-blue-500 text-blue-500 px-4 py-3 rounded-lg hover:bg-blue-50">
+                    
+          
+
+            
+          
+          <div className="flex-1 flex flex-col gap-4">
+            
+            <button
+             className="flex items-center justify-center border border-blue-500 text-blue-500 px-4 py-3 rounded-lg hover:bg-blue-50"
+              onClick={handleGoogleLogin}>
               <FaGoogle size={24} color="blue" />
               <span className="ml-2">Log in with Google</span>
             </button>
+            
             <button className="flex items-center justify-center border border-blue-700 text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50">
               <MdFacebook size={24} color="blue" />
               <span className="ml-2">Log in with Facebook</span>
             </button>
-           
+            
           </div>
         </div>
 
@@ -136,7 +154,7 @@ export default function LoginPage() {
             Privacy Policy
           </a>
           
-          <span>Copyright @IELTS Mastery 2024</span>
+          <span>Copyright IELTS Mastery 2024</span>
         </div>
       </div>
     </div>
