@@ -1,9 +1,12 @@
-"use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated } from "../../../utils/auth";
 
-const ProtectedRoute = ({ children }) => {
+interface ProtectedRouteProps {
+  children: ReactNode; // Specify the type of children
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -19,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
     return <p>Loading...</p>; // Optional loading message or spinner
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

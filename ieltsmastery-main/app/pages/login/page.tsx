@@ -144,7 +144,7 @@ export default function LoginPage() {
               <MdFacebook size={24} color="blue" />
               <span className="ml-2">Log in with Facebook</span>
             </button>
-           
+            
           </div>
         </div>
 
@@ -153,10 +153,8 @@ export default function LoginPage() {
           <a href="#" className="hover:underline">
             Privacy Policy
           </a>
-          <a href="#" className="hover:underline">
-            Forgot Password?
-          </a>
-          <span>Copyright @IELT Mastery 2024</span>
+          
+          <span>Copyright IELTS Mastery 2024</span>
         </div>
       </div>
     </div>
