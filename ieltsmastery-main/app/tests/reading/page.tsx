@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import { fetchPartData } from "../../../api/tests"; // Ensure this is your correct path
 import Link from "next/link"; // Import Link component
+import axios from "axios"; // Make sure axios is installed for API requests
 
 export default function Home() {
   const [isBlurred, setIsBlurred] = useState(true);
@@ -10,19 +11,14 @@ export default function Home() {
   const [partTime, setPartTime] = useState(0); // Timer for each part
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [readingMaterial, setReadingMaterial] = useState<string>("");
-  const [questions, setQuestions] = useState<{ question: string; answer: string }[]>([]);
+  const [readingMaterial, setReadingMaterial] = useState<string>(""); 
+  const [questions, setQuestions] = useState<{ id: number; question: string; answer: string }[]>([]);
   const [part, setPart] = useState(1); // Start with Part 1
   const [isTestComplete, setIsTestComplete] = useState(false); // Track if the test is complete
-  const testId = "1"; // Static for now
+  const [audioPlayed, setAudioPlayed] = useState(false); // Track if audio has been played
+  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({}); // Store answers
 
-  // Different audio files for each part
-  const audioFiles = [
-    "/audio/part1_audio.wav", // Audio for Part 1
-    "/audio/part2_audio.wav", // Audio for Part 2
-    "/audio/part3_audio.wav", // Audio for Part 3
-    "/audio/part4_audio.wav", // Audio for Part 4
-  ];
+  const testId = "1"; // Static for now
 
   // Fetch Part Data
   const loadPartData = async (part: number) => {
@@ -49,66 +45,99 @@ export default function Home() {
     };
   }, [isTimerRunning]);
 
-  // Timer logic for each part
-  useEffect(() => {
-    let partTimer: NodeJS.Timeout | null = null;
-    if (isTimerRunning && partTime < 900) { // Each part lasts 15 minutes (900 seconds)
-      partTimer = setInterval(() => {
-        setPartTime((prevPartTime) => prevPartTime + 1); // Increase part time
-      }, 1000);
-    }
-    return () => {
-      if (partTimer) clearInterval(partTimer);
-    };
-  }, [isTimerRunning, partTime]);
-
   // Handle Test Start
   const startTest = () => {
-    if (audio) {
-      audio.play();
-      audio.addEventListener("ended", () => {
+    if (part === 1 && !audioPlayed) {
+      // Play the audio only during Part 1 if it hasn't been played already
+      const audioInstance = new Audio("/audio/Reading_Start.wav");
+      setAudio(audioInstance);
+      audioInstance.play();
+      audioInstance.addEventListener("ended", () => {
         setIsBlurred(false);
-        setIsTimerRunning(true); // Start both timers
+        setIsTimerRunning(true); // Start timer
+        setAudioPlayed(true); // Mark audio as played
       });
+    } else {
+      // If audio has been played (for subsequent parts), just start the timer
+      setIsBlurred(false);
+      setIsTimerRunning(true);
     }
   };
 
-  // Handle Next Part
+  // Handle Next Part (Part 4 logic but no submission)
   const loadNextPart = () => {
     setIsTimerRunning(false); // Stop part timer
-    setPartTime(0); // Reset part timer
     setIsBlurred(true); // Blur questions again
     setPart(part + 1); // Move to next part
   };
 
-  // Handle Submit Test
-  const submitTest = () => {
-    setIsTimerRunning(false); // Stop overall timer
-    setIsTestComplete(true); // Mark the test as complete
-  };
+ const submitTest = async () => {
+    try {
+      console.log("Submitting test. Current questions:", questions);
+      console.log("User answers:", userAnswers);
 
-  // Load Part Data (for first part and next part)
+      for (const [questionId, userAnswer] of Object.entries(userAnswers)) {
+        console.log("Checking questionId:", questionId);
+        const question = questions.find((q) => q.id.toString() === questionId.toString());
+
+        if (question) {
+          console.log("Found question:", question);
+          await handleSubmitAnswer(question.id, userAnswer, question.answer);
+        } else {
+          console.warn(`Question with ID ${questionId} not found in questions array.`);
+          console.log("All questions:", questions);
+        }
+      }
+
+      setIsTestComplete(true);
+      setIsTimerRunning(false);
+    } catch (error) {
+      console.error("Error submitting test:", error);
+    }
+  };
+// Load Part Data (for first part and next part)
   useEffect(() => {
     if (part >= 1 && part <= 4) {
       loadPartData(part);
       if (part > 1) {
         setIsBlurred(true); // Blur questions initially for subsequent parts
       }
-      // Play the corresponding audio file for each part
-      if (typeof window !== "undefined") {
-        const audioInstance = new Audio(audioFiles[part - 1]); // Get audio based on current part
-        setAudio(audioInstance);
-      }
     }
-  }, [part]);
+  }, [part]); // Only run when part changes
 
-  // Reset Timer and Move to Next Part after 15 Minutes
-  useEffect(() => {
-    if (partTime >= 900 && part < 4) {
-      loadNextPart();
+  // Handle Answer Change
+  const handleAnswerChange = (questionId: number, userAnswer: string) => {
+    setUserAnswers((prev) => ({
+      ...prev,
+      [questionId]: userAnswer,
+    }));
+  };
+
+  // Handle Answer Submission (send to backend)
+  const handleSubmitAnswer = async (questionId: number, userAnswer: string, correctAnswer: string) => {
+    try {
+      console.log(questionId, userAnswer, correctAnswer);
+      const response = await axios.post("http://localhost:5000/api/tests/saveUserAnswer", {
+        testId: testId,
+        questionId: questionId,
+        userAnswer: userAnswer,
+        partId: part,
+        correctAnswer: correctAnswer,
+      });
+      console.log("Answer saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving answer:", error);
     }
-  }, [partTime, part]);
-
+  };
+  const handleNextPart = async () => {
+    await submitTest();
+    setPart((prevPart) => {
+      const newPart = prevPart + 1;
+      loadPartData(newPart); // Load next part immediately
+      return newPart;
+    });
+  };
+  
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-[#e8f1ff] p-8 font-serif">
@@ -139,10 +168,6 @@ export default function Home() {
             <div className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md text-center flex items-center justify-center">
               Timer: {Math.floor(time / 60)}:{String(time % 60).padStart(2, "0")}
             </div>
-            {/* Part Timer */}
-            <div className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md text-center flex items-center justify-center">
-              Part Timer: {Math.floor(partTime / 60)}:{String(partTime % 60).padStart(2, "0")}
-            </div>
           </div>
         </div>
 
@@ -170,6 +195,8 @@ export default function Home() {
                     className="border border-gray-300 rounded-md p-2 w-full"
                     placeholder="Your answer..."
                     disabled={isBlurred}
+                    value={userAnswers[question.id] || ""}
+                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                   />
                 </div>
               ))}
@@ -181,7 +208,7 @@ export default function Home() {
         <div className="flex justify-center mt-8">
           {part < 4 ? (
             <button
-              onClick={loadNextPart}
+              onClick={handleNextPart}
               className="px-6 py-3 text-white text-lg font-bold rounded-md"
               style={{ backgroundColor: "#03036D" }}
             >
