@@ -29,9 +29,7 @@ export default function LoginPage() {
   const handleGoogleLogin =()=>{
     window.location.href = 'http://localhost:5000/auth/google';
   }
-  const handleFacebookLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/facebook'; // Redirect to Facebook OAuth route
-  };
+
   
 
   // Handle form submission
@@ -57,7 +55,7 @@ export default function LoginPage() {
         setError("");
         // You would ideally store the JWT token in localStorage or cookies
         localStorage.setItem("token", data.token);
-        window.location.href = "/pages/dashboard"; // Redirect to the dashboard page
+        window.location.href = "/pages/profile_creation"; // Redirect to the dashboard page
       } else {
         const data = await response.json();
         setError(data.message || "Login failed.");
@@ -146,9 +144,7 @@ export default function LoginPage() {
               <span className="ml-2">Log in with Google</span>
             </button>
             
-            <button
-              className="flex items-center justify-center border border-blue-700 text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50"
-              onClick={handleFacebookLogin}>
+            <button className="flex items-center justify-center border border-blue-700 text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50">
               <MdFacebook size={24} color="blue" />
               <span className="ml-2">Log in with Facebook</span>
             </button>

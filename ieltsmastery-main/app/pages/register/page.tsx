@@ -175,7 +175,7 @@ export default function RegisterPage() {
             {success && <p className="mt-4 text-sm text-green-600">{success}</p>}
             <p className="mt-4 text-sm text-gray-700">
               Already have an account?{" "}
-              <Link href="./login" className="text-blue-600 font-semibold">
+              <Link href="./create_token" className="text-blue-600 font-semibold">
                 Login Here
               </Link>
             </p>
