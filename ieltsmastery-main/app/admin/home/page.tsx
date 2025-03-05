@@ -109,22 +109,24 @@ export default function AdminDashboard() {
               <p className="text-gray-600 text-center">Upload and manage audio-based IELTS tasks.</p>
             </div>
 
-            {/* Manage Writing Test */}
-            <div
-              className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
-              onClick={() => navigateTo("/admin/tests/writing")}
-            >
-              <Image
-                src="/icons/writing.png"
-                alt="Manage Writing Test"
-                width={80}
-                height={80}
-                className="mx-auto object-contain"
-              />
-              <h2 className="text-xl font-bold text-center mt-3 text-gray-800">Manage Writing Test</h2>
-              <p className="text-gray-600 text-center">Oversee and update writing topics and samples.</p>
-            </div>
-          </div>
+
+        {/* Manage Writing Test */}
+        <div
+          className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
+          onClick={() => navigateTo("/admin/tests/writing/main")}
+        >
+          <Image
+            src="/icons/writing.png"
+            alt="Manage Writing Test"
+            width={80}
+            height={80}
+            className="mx-auto object-contain"
+          />
+          <h2 className="text-xl font-bold text-center mt-3 text-gray-800">Manage Writing Test</h2>
+          <p className="text-gray-600 text-center">
+            Oversee and update writing topics and samples.
+          </p>
+
         </div>
       </AdminProtectedRoute>
     </>
