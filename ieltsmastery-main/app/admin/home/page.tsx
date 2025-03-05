@@ -102,7 +102,7 @@ export default function AdminDashboard() {
         {/* Manage Writing Test */}
         <div
           className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
-          onClick={() => navigateTo("/admin/tests/writing")}
+          onClick={() => navigateTo("/admin/tests/writing/main")}
         >
           <Image
             src="/icons/writing.png"
