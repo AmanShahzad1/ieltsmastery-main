@@ -4,14 +4,43 @@ import React from "react";
 import { useRouter } from "next/navigation"; // Use the App Router's navigation
 import styles from "./dashboard.module.css";
 import ProtectedRoute from "../RouteProtected/RouteProtected";
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
+
 const Dashboard: React.FC = () => {
   const router = useRouter();
+  
+  const handleClick = () => {
+    router.push("/pages/profile");
+  };
+
  const handleLogout=()=>{
   if (typeof window !== "undefined") {
     localStorage.removeItem("token");
   }
   router.push("/pages/login")
  }
+
+
+ const [username, setUsername] = useState("");
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const decoded = jwtDecode<{ username: string }>(token);
+          setUsername(decoded.username || "user");
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+    }
+  }, []); 
+ 
+
+
+
   const barData = [
     { date: "14, Jan", value: 44 },
     { date: "21, Jan", value: 50 },
@@ -103,7 +132,7 @@ const Dashboard: React.FC = () => {
             className={styles.profileImage}
           />
           <div className={styles.nameAndEmail}>
-            <p className={styles.profileName}>My Profile</p>
+            <p className={styles.profileName} onClick={handleClick}  style={{ cursor: 'pointer' }}>{username}</p>
             <p className={styles.profileEmail}>myprofile@gmail.com</p>
           </div>
         </div>

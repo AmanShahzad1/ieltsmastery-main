@@ -2,6 +2,39 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:5000/api"; // Backend base URL
 
+
+export const registerUserProfile = async (profileData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/user-profile`, profileData);
+    return response.data; // Return the server response
+  } catch (error) {
+    // Handle known error responses
+    if (error.response && error.response.data) {
+      throw error.response.data.message || "An error occurred while creating the profile.";
+    } else {
+      throw "An error occurred. Please try again.";
+    }
+  }
+};
+
+//get user profile
+export const getUserProfile = async (userId) => {
+ // debugger
+  try {
+    const response = await axios.get(`${BASE_URL}/auth/get-profile/${userId}`);
+    return response.data; // Return the server response
+  } catch (error) {
+    // Handle known error responses
+    if (error.response && error.response.data) {
+      throw error.response.data.message || "An error occurred while fetching the profile.";
+    } else {
+      throw "An error occurred. Please try again.";
+    }
+  }
+};
+
+
+
 export const registerUser = async (userData) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/register`, userData);

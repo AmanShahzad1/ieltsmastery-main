@@ -55,7 +55,7 @@ export default function LoginPage() {
         setError("");
         // You would ideally store the JWT token in localStorage or cookies
         localStorage.setItem("token", data.token);
-        window.location.href = "/pages/dashboard"; // Redirect to the dashboard page
+        window.location.href = "/pages/profile_creation"; // Redirect to the dashboard page
       } else {
         const data = await response.json();
         setError(data.message || "Login failed.");
