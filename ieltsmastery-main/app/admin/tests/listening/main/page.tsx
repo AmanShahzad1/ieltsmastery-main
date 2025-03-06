@@ -1,7 +1,7 @@
 "use client"; // Mark the component as a client component
 
 import React, { useEffect, useState } from "react";
-import { fetchTests, createTest } from "../../../../../api/tests"; // Import API functions
+import { fetchListeningTests, createListeningTest } from "../../../../../api/listening"; // Import API functions
 import Link from "next/link"; // Use next/link for client-side navigation
 // Define the structure of a test object
 interface Test {
@@ -9,13 +9,13 @@ interface Test {
   name: string;
 }
 
-export default function ReadingTestsPage() {
+export default function ListeningTestMainPage() {
   const [tests, setTests] = useState<Test[]>([]); // Set initial state as an empty array of Test type
 
   // Fetch the list of tests from the backend
   const getTests = async () => {
     try {
-      const fetchedTests = await fetchTests(); // Fetch tests from the API
+      const fetchedTests = await fetchListeningTests(); // Fetch tests from the API
       setTests(fetchedTests); // Store fetched tests in the state
     } catch (error) {
       console.error("Error fetching tests:", error);
@@ -30,7 +30,7 @@ export default function ReadingTestsPage() {
   // Handle the creation of a new test
   const handleCreateTest = async () => {
     try {
-      const newTest = await createTest(`Reading Test ${tests.length + 1}`); // Create new test
+      const newTest = await createListeningTest(`Listening ${tests.length + 1}`); // Create new test
       if (newTest && newTest.id && newTest.name) {
         // Ensure the new test has the correct structure
         setTests((prevTests) => [...prevTests, newTest]); // Add the newly created test to the state
@@ -54,13 +54,13 @@ export default function ReadingTestsPage() {
           />
         </div>
         <h1 className="text-2xl font-bold sm:ml-4 mt-4 sm:mt-0 text-center w-full">
-          Reading Tests
+          Listening Tests
         </h1>
       </header>
 
       {/* Main Content */}
       <div className="bg-white shadow-md rounded-md p-6">
-        <h2 className="text-lg font-bold mb-6">All Reading Tests</h2>
+        <h2 className="text-lg font-bold mb-6">All Listening Tests</h2>
 
         {/* List of Reading Tests */}
         <div className="space-y-4">
@@ -72,7 +72,7 @@ export default function ReadingTestsPage() {
               <span className="text-lg">{test.name}</span>
               <Link
                 href={{
-                  pathname: "/admin/tests/reading",
+                  pathname: "/admin/tests/listening",
                   query: { testId: test.id.toString() }, // Pass testId as a query parameter
                 }}
               >
