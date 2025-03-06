@@ -1,7 +1,7 @@
 "use client"; // Mark the component as a client component
 
 import React, { useEffect, useState } from "react";
-import { fetchTests, createTest } from "../../../../../api/tests"; // Import API functions
+import { fetchTests, createTest } from "../../../../../../api/tests"; // Import API functions
 import Link from "next/link"; // Use next/link for client-side navigation
 // Define the structure of a test object
 interface Test {
@@ -72,7 +72,7 @@ export default function ReadingTestsPage() {
               <span className="text-lg">{test.name}</span>
               <Link
                 href={{
-                  pathname: "/admin/tests/reading",
+                  pathname: "/admin/tests/reading/readingTest",
                   query: { testId: test.id.toString() }, // Pass testId as a query parameter
                 }}
               >

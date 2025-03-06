@@ -96,7 +96,7 @@ export default function AdminDashboard() {
             {/* Manage Listening Test */}
             <div
               className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
-              onClick={() => navigateTo("/admin/tests/listening")}
+              onClick={() => navigateTo("/admin/tests/listening/main")}
             >
               <Image
                 src="/icons/listening.png"
