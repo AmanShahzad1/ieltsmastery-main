@@ -1,39 +1,45 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
-import { fetchPartData } from "../../../api/tests";
+import { fetchListeningData } from "../../../api/listening"; // Use the same API function as the admin side
+import axios from "axios"; // Import axios for API calls
 import Link from "next/link";
 
 export default function ListeningTest() {
   const [timeUsed, setTimeUsed] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes total for all parts
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<{ type: string; question: string; answer: string; id: string }[]>([]); // Added `id` for question identification
   const [part, setPart] = useState(1);
   const [isTestComplete, setIsTestComplete] = useState(false);
-  const audioRef = useRef(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null); // For fetched audio URL
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // For fetched image URL
+  const [hasStarted, setHasStarted] = useState(false); // Track if the test has started
+  const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({}); // Track user answers by question ID
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [time, setTime] = useState(0);
-  const testId = "1";
+  const testId = "1"; // Replace with dynamic test ID if needed
 
-  const audioFiles = [
-    "/audio/part1_audio.wav",
-    "/audio/part2_audio.wav",
-    "/audio/part3_audio.wav",
-    "/audio/part4_audio.wav"
-  ];
-
-  const loadPartData = async (part) => {
-    try {
-      const partName = `Part ${part}`;
-      const data = await fetchPartData(testId, partName);
-      setQuestions(data.questions || []);
-    } catch (error) {
-      console.error("Error fetching part data:", error);
-    }
-  };
-
+  // Fetch listening test data (audio, image, and questions) for the selected part
   useEffect(() => {
-    let timer = null;
+    const fetchData = async () => {
+      try {
+        const partName = `Part ${part}`;
+        const data = await fetchListeningData(testId, partName);
+        setQuestions(data.questions || []);
+        setAudioUrl(data.audioUrl || null);
+        setImageUrl(data.imageUrl || null);
+      } catch (error) {
+        console.error("Error fetching part data:", error);
+      }
+    };
+
+    fetchData();
+  }, [part]);
+
+  // Timer logic
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
     if (isTimerRunning && timeRemaining > 0) {
       timer = setInterval(() => {
         setTimeUsed((prev) => prev + 1);
@@ -50,14 +56,10 @@ export default function ListeningTest() {
     };
   }, [isTimerRunning, timeRemaining]);
 
-  useEffect(() => {
-    if (part >= 1 && part <= 4) {
-      loadPartData(part);
-    }
-  }, [part]);
-
+  // Start the test
   const startTest = () => {
-    setIsTimerRunning(true);
+    setHasStarted(true); // Hide the "Start Listening" button
+    setIsTimerRunning(true); // Start the timer
     setTime(0);
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
@@ -65,6 +67,7 @@ export default function ListeningTest() {
     }
   };
 
+  // Handle play/pause for audio
   const handlePlayPause = () => {
     if (audioRef.current) {
       if (audioRef.current.paused) {
@@ -77,14 +80,44 @@ export default function ListeningTest() {
     }
   };
 
+  // Update time as audio plays
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setTime(audioRef.current.currentTime);
     }
   };
 
-  const loadNextPart = () => {
-    setIsTimerRunning(false);
+  // Handle user answers
+  const handleAnswerChange = (questionId: string, answer: string) => {
+    setUserAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
+
+  // Save user answers to the backend
+  const saveAnswers = async () => {
+    try {
+      // Loop through all questions and save answers
+      for (const question of questions) {
+        const userAnswer = userAnswers[question.id] || ""; // Get the user's answer (default to empty string if not answered)
+        await axios.post("http://localhost:5000/api/tests/saveListeningAnswer", {
+          testId: testId,
+          questionId: question.id,
+          userAnswer: userAnswer,
+          partId: part,
+          correctAnswer: question.answer, // Assuming the correct answer is stored in the question object
+        });
+      }
+      console.log("Answers saved successfully!");
+    } catch (error) {
+      console.error("Error saving answers:", error);
+      alert("An error occurred while saving your answers. Please try again.");
+    }
+  };
+
+  // Load the next part of the test
+  const loadNextPart = async () => {
+    // Save answers before moving to the next part
+    await saveAnswers();
+
     if (part < 4) {
       setPart(part + 1);
       setTime(0);
@@ -97,7 +130,24 @@ export default function ListeningTest() {
     }
   };
 
-  const formatTime = (seconds) => {
+  // End the test manually
+  const endTest = async () => {
+    // Show confirmation prompt
+    const isConfirmed = confirm("Are you sure you want to end the test? Your progress will be saved, but you won't be able to resume.");
+    if (isConfirmed) {
+      // Save answers before ending the test
+      await saveAnswers();
+
+      setIsTimerRunning(false); // Stop the timer
+      setIsTestComplete(true); // Mark the test as complete
+      if (audioRef.current) {
+        audioRef.current.pause(); // Pause the audio
+      }
+    }
+  };
+
+  // Format time for display
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins < 10 ? "0" : ""}${mins}:${secs < 10 ? "0" : ""}${secs}`;
@@ -113,67 +163,78 @@ export default function ListeningTest() {
 
         {!isTestComplete ? (
           <>
-            <button
-              className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-blue-600 w-full sm:w-48"
-              onClick={startTest}
-              disabled={isTimerRunning}
-            >
-              Start Listening
-            </button>
-
-            <div className="mt-4 bg-white shadow-md rounded-md p-4">
-              <audio
-                ref={audioRef}
-                src={audioFiles[part - 1]}
-                onTimeUpdate={handleTimeUpdate}
-              ></audio>
-
-              <div className="flex items-center justify-between mt-4">
-                <button
-                  className="bg-gray-300 text-gray-700 rounded-md px-4 py-2"
-                  onClick={handlePlayPause}
-                >
-                  {audioRef.current?.paused ? "Play" : "Pause"}
-                </button>
-                <div className="w-full mx-4">
-                  <input
-                    type="range"
-                    min="0"
-                    max={audioRef.current?.duration || 0}
-                    value={time}
-                    onChange={(e) => {
-                      if (audioRef.current) {
-                        audioRef.current.currentTime = e.target.value;
-                        setTime(e.target.value);
-                      }
-                    }}
-                    className="w-full"
-                  />
-                </div>
-                <span className="text-sm text-gray-600">
-                  {formatTime(time)}
-                </span>
-              </div>
+            {/* Timer Display */}
+            <div className="text-center mb-4">
+              <p className="text-lg font-bold">
+                Time Remaining: {formatTime(timeRemaining)}
+              </p>
             </div>
 
+            {/* Start Listening Button (only visible if the test hasn't started) */}
+            {!hasStarted && (
+              <button
+                className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-blue-600 w-full sm:w-48"
+                onClick={startTest}
+              >
+                Start Listening
+              </button>
+            )}
+
+            {/* End Test Button (only visible if the test has started) */}
+            {hasStarted && (
+              <button
+                className="bg-red-500 text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-red-600 w-full sm:w-48 mt-4"
+                onClick={endTest}
+              >
+                End Test
+              </button>
+            )}
+
+            {/* Audio Player and Image Display */}
+            <div className="mt-4 bg-white shadow-md rounded-md p-4">
+              {audioUrl && (
+                <audio
+                  ref={audioRef}
+                  src={audioUrl}
+                  onTimeUpdate={handleTimeUpdate}
+                  controls
+                  className="w-full"
+                ></audio>
+              )}
+
+              {imageUrl && (
+                <div className="mt-4 flex justify-center">
+                  <img
+                    src={imageUrl}
+                    alt="Listening Test Image"
+                    className="max-w-full h-auto rounded-md"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Questions Section */}
             <div className="bg-white shadow-md rounded-md p-6 w-full mt-6">
               <h3 className="text-lg font-bold mb-4">Questions - Part {part}</h3>
               <div className="space-y-6">
                 {questions.map((question, index) => (
-                  <div key={index}>
+                  <div key={question.id}>
                     <p className="text-sm font-medium mb-2">
-                      {index + 1}): {question.question}
+                      {index + 1}. {question.question}
                     </p>
                     <input
                       type="text"
                       className="border border-gray-300 rounded-md p-2 w-full"
                       placeholder="Your answer..."
+                      value={userAnswers[question.id] || ""}
+                      onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                     />
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Next Part Button */}
             <button
               className="mt-4 bg-green-500 text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-green-600 w-full sm:w-48"
               onClick={loadNextPart}
