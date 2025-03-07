@@ -50,29 +50,29 @@ export const fetchListeningData = async (testId, partName) => {
 // };
 export const saveListeningData = async (testId, partName, questions, formData) => {
   try {
-     // Upload Audio
-     let audioUrl = null;
-     if (formData.get("audio")) {
-       console.log("Frontend Audio Received")
-       const audioRes = await axios.post(`${BASE_URL}/upload-audio`, formData);
-       console.log("Audio Saved")
-       audioUrl = audioRes.data.audioUrl;
-     }
+    // Upload Audio
+    let audioUrl = null;
+    if (formData.get("audio")) {
+      console.log("Frontend Audio Received");
+      const audioRes = await axios.post(`${BASE_URL}/upload-audio`, formData);
+      console.log("Audio Saved");
+      audioUrl = audioRes.data.audioUrl;
+    }
 
-    // Upload Images
-    let imageUrls = [];
-    if (formData.getAll("images").length > 0) {
-      console.log("Frontend Images Received");
-      const imagesRes = await axios.post(`${BASE_URL}/upload-image`, formData);
-      console.log("Images Saved");
-      imageUrls = imagesRes.data.imageUrls;
+    // Upload Image (Single)
+    let imageUrl = null;
+    if (formData.get("image")) {
+      console.log("Frontend Image Received");
+      const imageRes = await axios.post(`${BASE_URL}/upload-image`, formData);
+      console.log("Image Saved");
+      imageUrl = imageRes.data.imageUrl;
     }
 
     // Save everything in DB
     const response = await axios.post(`${BASE_URL}/listening/${testId}/${partName}`, {
       questions,
       audioUrl,
-      imageUrls: JSON.stringify(imageUrls),
+      imageUrl, // Send single image URL
     });
 
     return response.data;
