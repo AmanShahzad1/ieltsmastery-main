@@ -24,9 +24,11 @@ export default function AdminDashboard() {
         <header className="bg-[#03036D] text-white p-6 shadow-lg flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+
             <p className="text-sm">
               Welcome, Admin! Manage the IELTS Mastery modules below.
             </p>
+
           </div>
           <button
             onClick={handleLogout}
