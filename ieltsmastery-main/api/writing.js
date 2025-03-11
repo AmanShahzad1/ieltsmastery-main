@@ -105,3 +105,35 @@ export const saveWritingAnswer = async ({ testId, questionId, userAnswer, partId
       throw error.response?.data?.message || "Error saving writing answer.";
     }
   };
+
+
+export const saveWritingLLMResponse = async ({ testId, questionId, feedback, partId, score }) => {
+    try {
+      console.log("Trying to save LLM")
+      const response = await axios.post(`${BASE_URL}/tests/writing/saveWritingLLMResponse`, {
+        testId,
+        questionId,
+        feedback,
+        partId,
+        score,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Error saving writing answer.";
+    }
+  };
+
+  //Flask api
+export const getFeedbackFromFlask = async (userAnswer) => {
+    try {
+      const response = await fetch(`http://localhost:5001/chatbot?question=${encodeURIComponent(userAnswer)}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch feedback from Flask backend");
+      }
+      const data = await response.json();
+      return data.response; // The feedback from the Flask backend
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      return null;
+    }
+  };

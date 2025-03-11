@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { fetchWritingPartData, saveWritingAnswer } from "../../../api/writing"; // Adjust the import path as needed
+import { fetchWritingPartData, saveWritingAnswer, getFeedbackFromFlask, saveWritingLLMResponse} from "../../../api/writing"; // Adjust the import path as needed
 import axios from "axios"; // For error handling
 
 const WritingTest = () => {
@@ -91,26 +91,43 @@ const WritingTest = () => {
   const saveResponse = async () => {
     try {
       const partId = taskType === "Task 1" ? 1 : 2; // Part ID for Task 1 or Task 2
-      const score = 0; // Replace with actual scoring logic if needed
-
-      // Loop through all questions and save answers
+  
+      // Send the user's answer to the Flask backend and get feedback
+      const feedback = await getFeedbackFromFlask(inputText);
+      if (!feedback) {
+        throw new Error("No feedback received from Flask backend");
+      }
+  
+      // Extract the band score from the feedback (assuming the feedback contains "Overall Band Score: X")
+      const bandScoreMatch = feedback.match(/Overall Band Score: (\d)/);
+      const score = bandScoreMatch ? parseInt(bandScoreMatch[1], 10) : 0; // Default to 0 if no score is found
+  
+      // Save the response to your backend
       for (const question of questions) {
         await saveWritingAnswer({
           testId,
           questionId: question.id, // Dynamic questionId from the questions array
           userAnswer: inputText,
           partId,
-          score,
+          score, // Use the extracted band score
+        });
+        
+        // Save the complete feedback and score using saveWritingLLMResponse
+        await saveWritingLLMResponse({
+          testId,
+          questionId: question.id, // Dynamic questionId from the questions array
+          feedback, // Complete feedback from the Flask backend
+          partId,
+          score, // Extracted band score
         });
       }
-
+  
       console.log("Response saved successfully!");
     } catch (error) {
       console.error("Error saving response:", error);
       alert("An error occurred while saving your response. Please try again.");
     }
   };
-
   // Load the next part of the test
   const loadNextPart = async () => {
     await saveResponse(); // Save the current response before moving to the next part
