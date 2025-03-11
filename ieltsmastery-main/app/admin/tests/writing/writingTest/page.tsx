@@ -106,6 +106,7 @@ export default function AdminWritingPage() {
         </h1>
       </header>
 
+
       {/* Show Material (Image URL) */}
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Material:</h3>
@@ -122,6 +123,7 @@ export default function AdminWritingPage() {
           <p className="text-center text-gray-600">No material available</p>
         )}
       </div>
+
 
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Select Task</h3>
