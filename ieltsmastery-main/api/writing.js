@@ -55,14 +55,31 @@ export const fetchWritingPartData = async (testId, partName) => {
 };
 
 
-export const saveWritingPartData = async (testId, partName, questions) => {
+
+
+export const saveWritingPartData = async (testId, partName, questions, formData) => {
   try {
- 
-    const response = await axios.post(`${BASE_URL}/tests/writing/${testId}/${partName}`,{
+    // Upload Image (Single)
+    let imageUrl = null;
+    if (formData && formData.get("image")) {
+      console.log("Frontend Image Received");
+      const imageRes = await axios.post(`${BASE_URL}/tests/upload-image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Required for file uploads
+        },
+      });
+      console.log("Image Saved");
+      imageUrl = imageRes.data.imageUrl; // Get the image URL from the response
+    }
+
+    // Save everything in DB
+    const response = await axios.post(`${BASE_URL}/tests/writing/${testId}/${partName}`, {
       testId,
       partName,
-      questions
+      questions,
+      material: imageUrl, // Send image URL as material
     });
+
     return response.data; // Return the server response
   } catch (error) {
     // Check for known error structures, fallback to a generic error message

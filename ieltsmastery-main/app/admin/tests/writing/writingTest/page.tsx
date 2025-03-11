@@ -8,8 +8,9 @@ import Link from "next/link";
 export default function AdminWritingPage() {
   const [questions, setQuestions] = useState<{ question: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Task 1");
-  const [image, setImage] = useState<File | null>(null);
-  const [material, setMaterial] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null); // For uploaded image file
+  const [material, setMaterial] = useState<string>(""); // For fetched or uploaded image URL
+  const [isUploading, setIsUploading] = useState<boolean>(false); // To track image upload status
 
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
@@ -26,7 +27,7 @@ export default function AdminWritingPage() {
         console.log("Fetched data:", data);
 
         setQuestions(data.questions || []);
-        setMaterial(data.material || "");
+        setMaterial(data.material || ""); // Set fetched image URL
       } catch (error) {
         console.error("⚠️ Failed to fetch part data:", error);
         setQuestions([]);
@@ -44,25 +45,56 @@ export default function AdminWritingPage() {
     }
   };
 
+  // Handle adding a new question
   const handleAddQuestion = () => {
     setQuestions([...questions, { question: "" }]);
   };
 
+  // Handle saving the Writing Test data
   const handleSave = async () => {
     if (!testId) {
       alert("Test ID is missing");
       return;
     }
-    try {
-      const response = await saveWritingPartData(testId, selectedPart, questions);
-      if (response.success) {
-        alert("Data saved successfully");
+
+    // Check if an image is selected for upload/update
+    if (!imageFile) {
+      if (material) {
+        alert("No image selected to update.");
       } else {
-        alert("Error saving data");
+        alert("No image selected to upload.");
+      }
+      return;
+    }
+
+    setIsUploading(true); // Start loading state
+
+    try {
+      // Create FormData object
+      const formData = new FormData();
+
+      // Append image file
+      formData.append("image", imageFile);
+
+      // Append other data (questions, testId, partName)
+      formData.append("testId", testId);
+      formData.append("partName", selectedPart);
+      formData.append("questions", JSON.stringify(questions));
+
+      // Save Writing Test data (including image upload)
+      const response = await saveWritingPartData(testId, selectedPart, questions, formData);
+      if (response.success) {
+        const imageUrl = response.imageUrl; // Get the image URL from the response
+        setMaterial(imageUrl); // Update the material state with the new image URL
+        alert("Data saved successfully!");
+      } else {
+        alert("Error saving data.");
       }
     } catch (error) {
       console.error("Error saving data:", error);
-      alert("An error occurred while saving.");
+      alert("Failed to save data.");
+    } finally {
+      setIsUploading(false); // End loading state
     }
   };
 
@@ -74,11 +106,24 @@ export default function AdminWritingPage() {
         </h1>
       </header>
 
-      {/* Show Material
+
+      {/* Show Material (Image URL) */}
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Material:</h3>
-        <p className="text-center text-gray-600">{material || "No material available"}</p>
-      </div> */}
+        {material ? (
+          <div className="text-center">
+            <img
+              src={material}
+              alt="Uploaded Material"
+              className="w-48 h-48 object-cover mx-auto rounded-md"
+            />
+            <p className="text-sm text-gray-600 mt-2">Image URL: {material}</p>
+          </div>
+        ) : (
+          <p className="text-center text-gray-600">No material available</p>
+        )}
+      </div>
+
 
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Select Task</h3>
@@ -125,21 +170,31 @@ export default function AdminWritingPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-md p-6 mt-6">
-        <h3 className="text-lg font-bold mb-4">Upload Image</h3>
+        <h3 className="text-lg font-bold mb-4">
+          {material ? "Update Image" : "Upload Image"}
+        </h3>
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setImage(e.target.files?.[0] || null)}
+          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
           className="border border-gray-300 rounded-md p-2 w-full"
         />
+        <button
+          onClick={handleSave}
+          disabled={isUploading}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400"
+        >
+          {isUploading ? "Saving..." : material ? "Update Image" : "Upload Image"}
+        </button>
       </div>
 
       <div className="flex justify-center mt-8">
         <button
           onClick={handleSave}
-          className="px-6 py-3 text-white text-lg font-bold rounded-md bg-blue-600 hover:bg-blue-700"
+          disabled={isUploading}
+          className="px-6 py-3 text-white text-lg font-bold rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
         >
-          Save ({selectedPart}) Test No: {testId}
+          {isUploading ? "Saving..." : `Save (${selectedPart}) Test No: ${testId}`}
         </button>
         <Link
           href="/admin/tests/writing/main"
