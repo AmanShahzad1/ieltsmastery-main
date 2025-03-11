@@ -2,33 +2,45 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { fetchPartData, savePartData } from "../../../../../api/tests";
+import { saveWritingPartData, fetchWritingPartData } from "../../../../../api/writing"; 
 import Link from "next/link";
 
 export default function AdminWritingPage() {
   const [questions, setQuestions] = useState<{ question: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Task 1");
   const [image, setImage] = useState<File | null>(null);
+  const [material, setMaterial] = useState<string>("");
+
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
 
+  // Fetch data whenever testId or selectedPart changes
   useEffect(() => {
-    if (testId && selectedPart) {
-      fetchPartData(testId, selectedPart)
-        .then((data) => {
-          setQuestions(data.questions || []);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch part data:", error);
-          setQuestions([]);
-        });
-    }
-  }, [testId, selectedPart]);
+    const fetchData = async () => {
+      if (!testId) return;
+      
+      console.log("Fetching data for:", { testId, selectedPart });
 
+      try {
+        const data = await fetchWritingPartData(testId, selectedPart);
+        console.log("Fetched data:", data);
+
+        setQuestions(data.questions || []);
+        setMaterial(data.material || "");
+      } catch (error) {
+        console.error("⚠️ Failed to fetch part data:", error);
+        setQuestions([]);
+        setMaterial("");
+      }
+    };
+
+    fetchData();
+  }, [testId, selectedPart]); // Runs when testId or selectedPart changes
+
+  // Handle part selection
   const handlePartSelection = (part: string) => {
     if (part !== selectedPart) {
       setSelectedPart(part);
-      setQuestions([]);
     }
   };
 
@@ -37,8 +49,12 @@ export default function AdminWritingPage() {
   };
 
   const handleSave = async () => {
+    if (!testId) {
+      alert("Test ID is missing");
+      return;
+    }
     try {
-      const response = await savePartData(testId as string, selectedPart, questions, image);
+      const response = await saveWritingPartData(testId, selectedPart, questions);
       if (response.success) {
         alert("Data saved successfully");
       } else {
@@ -53,8 +69,16 @@ export default function AdminWritingPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
-        <h1 className="text-2xl font-bold text-center w-full">Admin Writing Page</h1>
+        <h1 className="text-2xl font-bold text-center w-full">
+          Admin Writing Page - Test No: {testId}
+        </h1>
       </header>
+
+      {/* Show Material */}
+      <div className="bg-white shadow-md rounded-md p-4 mb-6">
+        <h3 className="text-lg font-bold mb-4 text-center">Material:</h3>
+        <p className="text-center text-gray-600">{material || "No material available"}</p>
+      </div>
 
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Select Task</h3>
@@ -62,7 +86,9 @@ export default function AdminWritingPage() {
           {["Task 1", "Task 2"].map((task) => (
             <button
               key={task}
-              className={`px-6 py-2 rounded-md border border-gray-300 text-center hover:bg-blue-100 ${selectedPart === task ? "bg-blue-100" : ""}`}
+              className={`px-6 py-2 rounded-md border border-gray-300 text-center hover:bg-blue-100 ${
+                selectedPart === task ? "bg-blue-100" : ""
+              }`}
               onClick={() => handlePartSelection(task)}
             >
               {task}
@@ -113,7 +139,7 @@ export default function AdminWritingPage() {
           onClick={handleSave}
           className="px-6 py-3 text-white text-lg font-bold rounded-md bg-blue-600 hover:bg-blue-700"
         >
-          Save Test
+          Save ({selectedPart}) Test No: {testId}
         </button>
         <Link
           href="/admin/tests/writing/main"
