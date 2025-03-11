@@ -66,7 +66,7 @@ export default function AdminDashboard() {
             },
             {
               title: "Manage Speaking Test",
-              path: "/admin/tests/speaking",
+              path: "/admin/tests/speaking/main",
               img: "/icons/speaking.png",
               desc: "Add and edit speaking prompts for IELTS tests.",
             },
