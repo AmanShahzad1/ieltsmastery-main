@@ -75,7 +75,8 @@ export const saveWritingPartData = async (testId, partName, questions) => {
 };
 export const saveWritingAnswer = async ({ testId, questionId, userAnswer, partId, score }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/writing/saveWritingAnswer`, {
+      console.log("Trying to save", testId, questionId, userAnswer, partId, score)
+      const response = await axios.post(`${BASE_URL}/tests/writing/saveWritingAnswer`, {
         testId,
         questionId,
         userAnswer,
