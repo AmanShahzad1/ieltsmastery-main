@@ -7,14 +7,14 @@ import Link from "next/link";
 
 export default function AdminListeningPage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null); // For fetched audio URL
-  const [imageUrls, setImageUrls] = useState<string[]>([]); // For fetched image URLs
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // For fetched image URL (single value)
   const [questions, setQuestions] = useState<{ type: string; question: string; answer: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Part 1");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
   const [audioFile, setAudioFile] = useState<File | null>(null); // For uploaded audio file
-  const [imageFiles, setImageFiles] = useState<File[]>([]); // For uploaded image files
+  const [imageFile, setImageFile] = useState<File | null>(null); // For uploaded image file (single value)
   const [showAudioUpload, setShowAudioUpload] = useState<boolean>(false); // Toggle audio upload input
   const [showImageUpload, setShowImageUpload] = useState<boolean>(false); // Toggle image upload input
 
@@ -25,9 +25,9 @@ export default function AdminListeningPage() {
           console.log("Fetched Data:", data); // Debugging: Log fetched data
           setQuestions(data.questions || []);
           setAudioUrl(data.audioUrl || null); // Set fetched audio URL
-          setImageUrls(data.imageUrl || []); // Set fetched image URLs
+          setImageUrl(data.imageUrl || null); // Set fetched image URL (single value)
           setAudioFile(null); // Reset audio file when part changes
-          setImageFiles([]); // Reset image files when part changes
+          setImageFile(null); // Reset image file when part changes
           setShowAudioUpload(false); // Hide audio upload input
           setShowImageUpload(false); // Hide image upload input
         })
@@ -35,7 +35,7 @@ export default function AdminListeningPage() {
           console.error("Failed to fetch part data:", error);
           setQuestions([]);
           setAudioUrl(null); // Reset audio URL on error
-          setImageUrls([]); // Reset image URLs on error
+          setImageUrl(null); // Reset image URL on error
         });
     }
   }, [testId, selectedPart]);
@@ -57,9 +57,8 @@ export default function AdminListeningPage() {
         setAudioUrl(URL.createObjectURL(e.target.files[0])); // Preview uploaded audio
         setShowAudioUpload(false); // Hide upload input after selection
       } else {
-        const newImageFiles = Array.from(e.target.files);
-        setImageFiles([...imageFiles, ...newImageFiles]); // Add uploaded image files
-        setImageUrls([...imageUrls, ...newImageFiles.map((file) => URL.createObjectURL(file))]); // Preview uploaded images
+        setImageFile(e.target.files[0]); // Set uploaded image file (single value)
+        setImageUrl(URL.createObjectURL(e.target.files[0])); // Preview uploaded image
         setShowImageUpload(false); // Hide upload input after selection
       }
     }
@@ -68,17 +67,17 @@ export default function AdminListeningPage() {
   const handleSave = async () => {
     try {
       const formData = new FormData();
-  
+
       // Append audio file (if uploaded)
       if (audioFile) {
         formData.append("audio", audioFile);
       }
-  
-      // Append all image files with the key "images"
-      imageFiles.forEach((file) => {
-        formData.append("images", file);
-      });
-  
+
+      // Append image file (if uploaded)
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
       // Save data to the backend
       const response = await saveListeningData(testId as string, selectedPart, questions, formData);
       if (response.success) {
@@ -149,33 +148,27 @@ export default function AdminListeningPage() {
       </div>
 
       <div className="bg-white shadow-md rounded-md p-6 mb-6">
-        <h3 className="text-lg font-bold mb-4">Images</h3>
-        {imageUrls.length > 0 ? (
+        <h3 className="text-lg font-bold mb-4">Image</h3>
+        {imageUrl ? (
           <>
             <div className="mt-4">
               <p className="text-sm text-gray-600">Preview:</p>
-              <div className="flex flex-wrap gap-4 mt-4">
-                {imageUrls.map((url, index) => (
-                  <img
-                    key={url} // Use URL as key to force re-render
-                    src={url}
-                    alt={`Preview ${index}`}
-                    className="w-24 h-24 object-cover rounded-md"
-                  />
-                ))}
-              </div>
+              <img
+                src={imageUrl}
+                alt="Preview"
+                className="w-24 h-24 object-cover rounded-md"
+              />
             </div>
             <button
               onClick={() => setShowImageUpload(!showImageUpload)}
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
             >
-              Update Images
+              Update Image
             </button>
             {showImageUpload && (
               <input
                 type="file"
                 accept="image/*"
-                multiple
                 onChange={(e) => handleFileUpload(e, "image")}
                 className="mt-4"
               />
@@ -185,7 +178,6 @@ export default function AdminListeningPage() {
           <input
             type="file"
             accept="image/*"
-            multiple
             onChange={(e) => handleFileUpload(e, "image")}
           />
         )}

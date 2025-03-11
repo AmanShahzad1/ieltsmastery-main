@@ -40,6 +40,44 @@ export const createTest = async (testName) => {
   
 
 
+
+// Fetch test part data (questions and reading material)
+export const fetchPartData = async (testId, partName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/tests/${testId}/${partName}`);
+    console.log("Response", response);
+    return response.data; // Return the data from the response
+  } catch (error) {
+    // Check for known error structures, fallback to a generic error message
+    if (error.response && error.response.data) {
+      throw error.response.data.message || "Error fetching test part data.";
+    } else {
+      throw "An error occurred while fetching data. Please try again.";
+    }
+  }
+};
+
+// Save test part data (questions and reading material)
+export const savePartData = async (testId, partName, questions, readingMaterial) => {
+  try {
+ 
+    const response = await axios.post(`${BASE_URL}/tests/${testId}/${partName}`, {
+      testId,
+      partName,
+      questions,
+      readingMaterial,
+    });
+    return response.data; // Return the server response
+  } catch (error) {
+    // Check for known error structures, fallback to a generic error message
+    if (error.response && error.response.data) {
+      throw error.response.data.message || "Error saving test part data.";
+    } else {
+      throw "An error occurred while saving data. Please try again.";
+    }
+  }
+};
+
 // Fetch test data for a specific testId
 // export const fetchTestData = async (testId) => {
 //     try {
@@ -271,43 +309,3 @@ export const createTest = async (testName) => {
 //       throw error;
 //     }
 //   };
-  
-
-// Fetch test part data (questions and reading material)
-export const fetchPartData = async (testId, partName) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/tests/${testId}/${partName}`);
-    console.log("Response", response);
-    return response.data; // Return the data from the response
-  } catch (error) {
-    // Check for known error structures, fallback to a generic error message
-    if (error.response && error.response.data) {
-      throw error.response.data.message || "Error fetching test part data.";
-    } else {
-      throw "An error occurred while fetching data. Please try again.";
-    }
-  }
-};
-
-// Save test part data (questions and reading material)
-export const savePartData = async (testId, partName, questions, readingMaterial) => {
-  try {
- 
-    const response = await axios.post(`${BASE_URL}/tests/${testId}/${partName}`, {
-      testId,
-      partName,
-      questions,
-      readingMaterial,
-    });
-    return response.data; // Return the server response
-  } catch (error) {
-    // Check for known error structures, fallback to a generic error message
-    if (error.response && error.response.data) {
-      throw error.response.data.message || "Error saving test part data.";
-    } else {
-      throw "An error occurred while saving data. Please try again.";
-    }
-  }
-};
-
-
