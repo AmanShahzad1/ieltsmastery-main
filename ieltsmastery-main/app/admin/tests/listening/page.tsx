@@ -1,48 +1,47 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchListeningData, saveListeningData } from "../../../../api/listening";
 import Link from "next/link";
+import axios from "axios";
 
 export default function AdminListeningPage() {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null); // For fetched audio URL
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // For fetched image URL (single value)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [questions, setQuestions] = useState<{ type: string; question: string; answer: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Part 1");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
-  const [audioFile, setAudioFile] = useState<File | null>(null); // For uploaded audio file
-  const [imageFile, setImageFile] = useState<File | null>(null); // For uploaded image file (single value)
-  const [showAudioUpload, setShowAudioUpload] = useState<boolean>(false); // Toggle audio upload input
-  const [showImageUpload, setShowImageUpload] = useState<boolean>(false); // Toggle image upload input
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [showAudioUpload, setShowAudioUpload] = useState<boolean>(false);
+  const [showImageUpload, setShowImageUpload] = useState<boolean>(false);
 
   useEffect(() => {
     if (testId && selectedPart) {
       fetchListeningData(testId, selectedPart)
         .then((data) => {
-          console.log("Fetched Data:", data); // Debugging: Log fetched data
           setQuestions(data.questions || []);
-          setAudioUrl(data.audioUrl || null); // Set fetched audio URL
-          setImageUrl(data.imageUrl || null); // Set fetched image URL (single value)
-          setAudioFile(null); // Reset audio file when part changes
-          setImageFile(null); // Reset image file when part changes
-          setShowAudioUpload(false); // Hide audio upload input
-          setShowImageUpload(false); // Hide image upload input
+          setAudioUrl(data.audioUrl || null);
+          setImageUrl(data.imageUrl || null);
+          setAudioFile(null);
+          setImageFile(null);
+          setShowAudioUpload(false);
+          setShowImageUpload(false);
         })
         .catch((error) => {
           console.error("Failed to fetch part data:", error);
           setQuestions([]);
-          setAudioUrl(null); // Reset audio URL on error
-          setImageUrl(null); // Reset image URL on error
+          setAudioUrl(null);
+          setImageUrl(null);
         });
     }
   }, [testId, selectedPart]);
 
   const handlePartSelection = (part: string) => {
     if (part !== selectedPart) {
-      setSelectedPart(part); // Update selected part
+      setSelectedPart(part);
     }
   };
 
@@ -53,43 +52,64 @@ export default function AdminListeningPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: "audio" | "image") => {
     if (e.target.files) {
       if (type === "audio") {
-        setAudioFile(e.target.files[0]); // Set uploaded audio file
-        setAudioUrl(URL.createObjectURL(e.target.files[0])); // Preview uploaded audio
-        setShowAudioUpload(false); // Hide upload input after selection
+        setAudioFile(e.target.files[0]);
+        setAudioUrl(URL.createObjectURL(e.target.files[0]));
+        setShowAudioUpload(false);
       } else {
-        setImageFile(e.target.files[0]); // Set uploaded image file (single value)
-        setImageUrl(URL.createObjectURL(e.target.files[0])); // Preview uploaded image
-        setShowImageUpload(false); // Hide upload input after selection
+        setImageFile(e.target.files[0]);
+        setImageUrl(URL.createObjectURL(e.target.files[0]));
+        setShowImageUpload(false);
       }
     }
   };
 
   const handleSave = async () => {
+    setIsSaving(true)
     try {
-      const formData = new FormData();
-
-      // Append audio file (if uploaded)
+      let finalAudioUrl = null;
+      let finalImageUrl = null;
+  
+      // Upload audio if new file exists
       if (audioFile) {
-        formData.append("audio", audioFile);
+        const audioFormData = new FormData()
+        audioFormData.append('audio', audioFile)
+        const audioRes = await axios.post(`http://localhost:5000/api/tests/upload-audio`, audioFormData);
+        console.log("Audio Saved");
+        finalAudioUrl = audioRes.data.audioUrl;
+        
       }
-
-      // Append image file (if uploaded)
+    
+  
+      // Upload image if new file exists
       if (imageFile) {
-        formData.append("image", imageFile);
+        const imageFormData = new FormData()
+        imageFormData.append('image', imageFile)
+        const imageResponse = await axios.post(`http://localhost:5000/api/tests/upload-image`, imageFormData);
+        console.log("Image Saved");
+        finalImageUrl = imageResponse.data.imageUrl;
       }
-
-      // Save data to the backend
-      const response = await saveListeningData(testId as string, selectedPart, questions, formData);
-      if (response.success) {
-        alert("Listening Test Data Saved!");
-      } else {
-        alert("Error saving data: " + response.message);
+    
+      // Save all data
+      const saveResponse = await saveListeningData(
+        testId as string,
+        selectedPart,
+        questions,
+        finalAudioUrl,
+        finalImageUrl
+      )
+  
+      if (!saveResponse.success) {
+        throw new Error(saveResponse.error || 'Save failed')
       }
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("An error occurred while saving.");
+  
+      alert('Saved successfully!')
+    } catch (error: any) {
+      console.error('Save error:', error)
+      alert(`Error: ${error.message || 'Unknown error'}`)
+    } finally {
+      setIsSaving(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
