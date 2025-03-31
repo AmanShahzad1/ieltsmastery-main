@@ -48,31 +48,13 @@ export const fetchListeningData = async (testId, partName) => {
 //     throw error.response?.data?.message || "Error saving data.";
 //   }
 // };
-export const saveListeningData = async (testId, partName, questions, formData) => {
+export const saveListeningData = async (testId, partName, questions, audioUrl, imageUrl) => {
   try {
-    // Upload Audio
-    let audioUrl = null;
-    if (formData.get("audio")) {
-      console.log("Frontend Audio Received");
-      const audioRes = await axios.post(`${BASE_URL}/upload-audio`, formData);
-      console.log("Audio Saved");
-      audioUrl = audioRes.data.audioUrl;
-    }
-
-    // Upload Image (Single)
-    let imageUrl = null;
-    if (formData.get("image")) {
-      console.log("Frontend Image Received");
-      const imageRes = await axios.post(`${BASE_URL}/upload-image`, formData);
-      console.log("Image Saved");
-      imageUrl = imageRes.data.imageUrl;
-    }
-
     // Save everything in DB
     const response = await axios.post(`${BASE_URL}/listening/${testId}/${partName}`, {
       questions,
       audioUrl,
-      imageUrl, // Send single image URL
+      imageUrl
     });
 
     return response.data;
