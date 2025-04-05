@@ -69,19 +69,18 @@ export const saveSpeakingData = async (testId, partName, questions) => {
   }
 };
 
-/* export const saveSpeakingData = async (testId, questions) => {
-  try {
-    console.log("Saving speaking test data:", testId, questions);
-
-    // Save questions in DB (JSONB format)
-    const response = await axios.post(`${BASE_URL}/speaking/${testId}`, {
-      questions: JSON.stringify(questions), // Convert to JSON string
-    });
-
-    console.log("Speaking test data saved successfully:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error saving speaking test data:", error);
-    throw error.response?.data?.message || "Error saving data.";
-  }
-}; */
+export const saveSpeakingAnswer = async ({ testId, questionId, userAnswer, score, feedback }) => {
+    try {
+      console.log("Trying to save", testId, questionId, userAnswer, score, feedback)
+      const response = await axios.post(`${BASE_URL}/speaking/saveSpeakingAnswer`, {
+        testId,
+        questionId,
+        userAnswer,
+        score,
+        feedback
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Error saving writing answer.";
+    }
+  };
