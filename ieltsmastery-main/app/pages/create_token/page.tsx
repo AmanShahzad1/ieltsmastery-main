@@ -1,11 +1,8 @@
 "use client";
 import { useState } from "react";
 import { MdFacebook } from "react-icons/md";
-import { FaApple } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
-import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/dist/server/api-utils";
 // import { useRouter } from 'next/navigation';
 
 

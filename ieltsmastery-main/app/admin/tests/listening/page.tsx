@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchListeningData, saveListeningData } from "../../../../api/listening";
 import Link from "next/link";
+import Image from "next/image";
 import axios from "axios";
 
 export default function AdminListeningPage() {
@@ -114,6 +115,16 @@ export default function AdminListeningPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
+         <div className="flex items-center mr-6 sm:mr-4">
+                <Image
+                  src="/logo.png"
+                  alt="IELTS Mastery Solutions Logo"
+                  width={112}
+                  height={112}
+                  className="h-28 w-28"
+                  priority
+                />
+                </div>
         <h1 className="text-2xl font-bold text-center w-full">Admin Listening Test</h1>
       </header>
 

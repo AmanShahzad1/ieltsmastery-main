@@ -1,30 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchWritingTests, createWritingTest } from "../../../../../api/writing"; // Use functions from api/writing.js
+import { fetchWritingTests, createWritingTest } from "../../../../../api/writing";
 import Link from "next/link";
+import Image from 'next/image';
 
 interface Test {
   id: number;
   name: string;
 }
-// const getTests = async () => {
-  //   try {
-  //     const fetchedTests = await fetchWritingTests();
-  //     setTests(fetchedTests); // Set the tests (could be an empty array)
-  //   } catch (error) {
-  //     console.error("Error fetching tests:", error);
-  //     setTests([]); // Set tests to an empty array in case of error
-  //   }
-  // };
+
 export default function WritingTestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
 
-  
-const getTests = async () => {
+  const getTests = async () => {
     try {
-      const fetchedTests = await fetchWritingTests(); // Fetch tests from the API
-      setTests(fetchedTests); // Store fetched tests in the state
+      const fetchedTests = await fetchWritingTests();
+      setTests(fetchedTests);
     } catch (error) {
       console.error("Error fetching tests:", error);
     }
@@ -34,23 +26,11 @@ const getTests = async () => {
     getTests();
   }, []);
 
-  // const handleCreateTest = async () => {
-  //   try {
-  //     const newTest = await createWritingTest(`Writing Test ${tests.length + 1}`);
-  //     if (newTest && newTest.id && newTest.name) {
-  //       setTests((prevTests) => [...prevTests, newTest]);
-  //     } else {
-  //       console.error("Invalid test structure returned", newTest);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating test:", error);
-  //   }
-  // };
   const handleCreateTest = async () => {
     try {
-      const newTest = await createWritingTest(`Writing Test ${tests.length + 1}`); // Create new test
+      const newTest = await createWritingTest(`Writing Test ${tests.length + 1}`);
       if (newTest && newTest.id && newTest.name) {
-        setTests((prevTests) => [...prevTests, newTest]); // Add the newly created test to the state
+        setTests((prevTests) => [...prevTests, newTest]);
       } else {
         console.error("Invalid test structure returned", newTest);
       }
@@ -63,7 +43,13 @@ const getTests = async () => {
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
         <div className="flex items-center mr-6 sm:mr-4">
-          <img src="/logo.png" alt="IELTS Mastery Solutions Logo" className="h-28 w-28" />
+          <Image
+            src="/logo.png"
+            alt="IELTS Mastery Solutions Logo"
+            width={112}
+            height={112}
+            className="h-28 w-28"
+          />
         </div>
         <h1 className="text-2xl font-bold sm:ml-4 mt-4 sm:mt-0 text-center w-full">Writing Tests</h1>
       </header>
@@ -71,11 +57,10 @@ const getTests = async () => {
       <div className="bg-white shadow-md rounded-md p-6">
         <h2 className="text-lg font-bold mb-6">All Writing Tests</h2>
 
-        {/* Display a message if no tests are created */}
         {tests.length === 0 ? (
           <div className="text-center text-gray-600">
             <p>No tests created yet.</p>
-            <p>Click the "Create Test" button to add a new test.</p>
+            <p>Click the &quot;Create Test&quot; button to add a new test.</p>
           </div>
         ) : (
           <div className="space-y-4">

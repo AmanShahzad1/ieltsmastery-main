@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { MdFacebook } from "react-icons/md";
-import { FaApple, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import Link from "next/link";
 import { registerUser } from "@/api/auth"; // Import the registerUser function
 

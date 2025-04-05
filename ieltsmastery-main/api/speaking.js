@@ -44,10 +44,10 @@ export const createSpeakingTest = async (testName) => {
   //fetch a single speaking data
    // Update this with your actual API URL
 
-export const fetchSpeakingData = async (testId) => {
+export const fetchSpeakingData = async (testId, partName) => {
   try {
     console.log("Fetching speaking test data:", testId);
-    const response = await axios.get(`${BASE_URL}/speaking/${testId}`);
+    const response = await axios.get(`${BASE_URL}/speaking/${testId}/${partName}`);
     console.log("Speaking test data fetched successfully:", response.data);
     return response.data || { questions: [] }; // Return an empty list if no questions exist
   } catch (error) {
@@ -55,15 +55,12 @@ export const fetchSpeakingData = async (testId) => {
     throw error.response?.data?.message || "Error fetching data.";
   }
 };
-export const saveSpeakingData = async (testId,questions) => {
+export const saveSpeakingData = async (testId, partName, questions) => {
   try {
-    console.log("Saving speaking test data:", testId, questions);
-
-    // Save questions in DB (JSONB format)
-    const response = await axios.post(`${BASE_URL}/speaking/${testId}`, {
-      questions, // Store as JSONB
+    console.log("Saving speaking test data:", testId, partName, questions);
+    const response = await axios.post(`${BASE_URL}/speaking/${testId}/${partName}`, {
+      questions 
     });
-
     console.log("Speaking test data saved successfully:", response.data);
     return response.data;
   } catch (error) {

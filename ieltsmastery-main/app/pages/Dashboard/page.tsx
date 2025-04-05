@@ -149,7 +149,7 @@ const Dashboard: React.FC = () => {
           <div className={styles.leftContent}>
             {/* Today's Tests */}
             <section className={styles.card}>
-              <h2 className={styles.cardTitle}>Today's Tests</h2>
+              <h2 className={styles.cardTitle}>Today&apos;s Tests</h2>
               <p className={styles.cardSubtitle}>(11/11/2024)</p>
               <div className={styles.testCategories}>
                 {testCategories.map((test, index) => (
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
               <div className={styles.activityCircles}>
                 <div className={`${styles.circle} ${styles.largeCircle}`}>
                   <span className={styles.circleText}>
-                    1.25 <br /> hrs/day
+                    1.25 <br /> hrs&apos;day
                   </span>
                 </div>
                 <div className={`${styles.circle} ${styles.mediumCircle}`}>
