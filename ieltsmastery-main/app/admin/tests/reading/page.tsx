@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation"; // Import useSearchParams to get query parameters
 import { fetchPartData, savePartData } from "../../../../api/tests"; // Import API functions
 import Link from "next/link"; // Use next/link for navigation
+import Image from "next/image";
 
 export default function AdminReadingPage() {
   const [readingMaterial, setReadingMaterial] = useState<string>("");
@@ -54,7 +55,14 @@ export default function AdminReadingPage() {
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
         <div className="flex items-center mr-6 sm:mr-4">
-          <img src="/logo.png" alt="IELTS Mastery Solutions Logo" className="h-28 w-28" />
+        <Image
+          src="/logo.png"
+          alt="IELTS Mastery Solutions Logo"
+          width={112}
+          height={112}
+          className="h-28 w-28"
+          priority
+        />
         </div>
         <h1 className="text-2xl font-bold sm:ml-4 mt-4 sm:mt-0 text-center w-full">Admin Reading Page</h1>
       </header>

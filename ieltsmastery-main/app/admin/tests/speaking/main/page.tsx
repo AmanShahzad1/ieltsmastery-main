@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link"; // Use next/link for client-side navigation
 import {createSpeakingTest,fetchSpeakingTests}from "../../../../../api/speaking"; 
+import Image from "next/image";
 // Import API functions
 // Define the structure of a test object
 interface Test {
@@ -48,11 +49,13 @@ export default function SpeakingTestMainPage() {
       {/* Header */}
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
         <div className="flex items-center mr-6 sm:mr-4">
-          <img
-            src="/logo.png"
-            alt="IELTS Mastery Solutions Logo"
-            className="h-28 w-28"
-          />
+        <Image
+          src="/logo.png"
+          alt="IELTS Mastery Solutions Logo"
+          width={112}
+          height={112}
+          className="h-28 w-28"
+        />
         </div>
         <h1 className="text-2xl font-bold sm:ml-4 mt-4 sm:mt-0 text-center w-full">
           Speaking Tests

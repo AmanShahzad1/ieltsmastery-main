@@ -10,7 +10,7 @@ import { getUserProfile } from "@/api/auth";
 export default function ProfilePage() {
   
   const [userId, setUserId] = useState<number>();
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   // Default user state
   const [user, setUser] = useState({
@@ -53,9 +53,7 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error("Error fetching user profile data:", error);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
     if (userId && userId !== 0) {

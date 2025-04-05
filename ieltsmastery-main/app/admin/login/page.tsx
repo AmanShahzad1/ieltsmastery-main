@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
-import { loginAdmin } from "@/api/auth"; // Import the admin login API function
+import Image from "next/image"; // Added for image optimization
+import { loginAdmin } from "@/api/auth";
 
 export default function AdminLoginPage() {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -17,13 +17,13 @@ export default function AdminLoginPage() {
     e.preventDefault();
     try {
       const data = await loginAdmin(formData.username, formData.password);
-      setSuccess(data.message); // Use the backend-provided success message
+      setSuccess(data.message);
       setError("");
       localStorage.setItem("adminToken", data.token);
-      window.location.href = "/admin/home"; // Redirect to the admin dashboard
+      window.location.href = "/admin/home";
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message); // Use the backend-provided error message
+        setError(err.message);
       } else {
         setError("An unknown error occurred.");
       }
@@ -35,7 +35,13 @@ export default function AdminLoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-10 max-w-4xl w-full">
         <div className="text-center mb-6">
-          <img src="/Logo.png" alt="Admin Logo" className="mx-auto w-20" />
+          <Image 
+            src="/Logo.png" 
+            alt="Admin Logo" 
+            width={80} 
+            height={80} 
+            className="mx-auto" 
+          />
           <h1 className="text-2xl font-bold text-blue-900">Admin Login</h1>
         </div>
         <form onSubmit={handleSubmit}>
@@ -66,7 +72,6 @@ export default function AdminLoginPage() {
         </form>
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
         {success && <p className="mt-4 text-sm text-green-600">{success}</p>}
-        
       </div>
     </div>
   );
