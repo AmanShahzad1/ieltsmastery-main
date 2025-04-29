@@ -77,6 +77,47 @@ export const savePartData = async (testId, partName, questions, readingMaterial)
     }
   }
 };
+
+
+// plan generation work
+export const fetchTestType = async (testId) => {
+
+  try {
+    console.log("Frontend Received", testId);
+    const response = await axios.get(`${BASE_URL}/tests/type/${testId}`);
+    console.log("Response", response);
+    return response.data; // Return the data from the response
+  } catch (error) {
+    // Check for known error structures, fallback to a generic error message
+    if (error.response && error.response.data) {
+      throw error.response.data.message || "Error fetching test type data.";
+    } else {
+      throw "An error occurred while fetching data. Please try again.";
+    }
+  }
+};
+
+export const saveTestType = async (testId, type, difficulty) => {
+  try {
+ 
+    const response = await axios.post(`${BASE_URL}/tests/type/${testId}`, {
+      testId,
+      type,
+      difficulty
+    });
+    return response.data; // Return the server response
+  } catch (error) {
+    // Check for known error structures, fallback to a generic error message
+    if (error.response && error.response.data) {
+      throw error.response.data.message || "Error saving test part data.";
+    } else {
+      throw "An error occurred while saving data. Please try again.";
+    }
+  }
+};
+
+
+
 //writing work
 
 
