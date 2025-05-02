@@ -2,6 +2,44 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:5000/api"; // Backend base URL
 
+//------------------------------
+//fetch starting test
+export const fetchStartingTest = async () => {
+  try {
+    console.log("Fetching starting test data...");
+    const response = await axios.get(`${BASE_URL}/tests/starting/tests`);
+    console.log("Starting test data fetched successfully:", response.data);
+    return response.data || { questions: [] }; // Return empty list if none
+  } catch (error) {
+    console.error("Error fetching starting test data:", error);
+    throw error.response?.data?.message || "Error fetching starting test data.";
+  }
+};
+//save starting test answers
+export const submitStartingTestAnswer = async (uId, questionId, answer) => {
+  try {
+    console.log("Submitting starting test answer...");
+    const response = await axios.post(`${BASE_URL}/tests/addstarting/answer`, {
+      uId,
+      questionId,
+      answer
+    });
+    console.log("Answer submitted successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting starting test answer:", error);
+    throw error.response?.data?.message || "Error submitting answer.";
+  }
+};
+
+//==============================
+
+
+
+
+
+
+
 export const fetchTests = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/tests");

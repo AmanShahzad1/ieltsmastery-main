@@ -126,7 +126,7 @@ import { jwtDecode } from "jwt-decode";
           {error && <p className="text-red-600">{error}</p>}
           {success && <p className="text-green-600">{success}</p>}
           <p>
-            Already have a profile <Link href="./dashboard" className="text-blue-600">GO TO Dashboard</Link>
+            Already have a profile <Link href="../tests/start_test" className="text-blue-600">GO TO Dashboard</Link>
           </p>
         </form>
 
