@@ -42,7 +42,7 @@ npm run dev
 Frontend runs at **http://localhost:3000**.
 
 ### 🔗 Related Repositories
-- [IELTS Mastery Platform - Backend](https://github.com/AmanShahzad1/ieltsmastery-backend])
+- [IELTS Mastery Platform - Backend](https://github.com/AmanShahzad1/ieltsmastery-backend)
 - [IELTS Mastery Platform - LLM Server](https://github.com/AmanShahzad1/ieltsMastery-LLM-Server)
 
 
