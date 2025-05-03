@@ -2,7 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { saveWritingPartData, fetchWritingPartData } from "../../../../../api/writing"; 
+import {
+  saveWritingPartData,
+  fetchWritingPartData,
+  fetchWritingTestType,
+  saveWritingTestType,
+} from "../../../../../api/writing";
 import Link from "next/link";
 
 export default function AdminWritingPage() {
@@ -15,11 +20,16 @@ export default function AdminWritingPage() {
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
 
+  //Plan Gen
+  // NEW STATE ONLY
+  const [testType, setTestType] = useState<string>("Academic");
+  const [difficulty, setDifficulty] = useState<string>("Intermediate");
+
   // Fetch data whenever testId or selectedPart changes
   useEffect(() => {
     const fetchData = async () => {
       if (!testId) return;
-      
+
       console.log("Fetching data for:", { testId, selectedPart });
 
       try {
@@ -33,6 +43,14 @@ export default function AdminWritingPage() {
         setQuestions([]);
         setMaterial("");
       }
+
+      // NEW: Separate call for type/difficulty (non-blocking)
+      fetchWritingTestType(testId)
+        .then((data) => {
+          if (data.type) setTestType(data.type);
+          if (data.difficulty) setDifficulty(data.difficulty);
+        })
+        .catch(() => {});
     };
 
     fetchData();
@@ -82,7 +100,14 @@ export default function AdminWritingPage() {
       formData.append("questions", JSON.stringify(questions));
 
       // Save Writing Test data (including image upload)
-      const response = await saveWritingPartData(testId, selectedPart, questions, formData);
+      const response = await saveWritingPartData(
+        testId,
+        selectedPart,
+        questions,
+        formData
+      );
+          // NEW: Save type/difficulty (non-blocking)
+      await saveWritingTestType(testId as string, testType, difficulty);
       if (response.success) {
         const imageUrl = response.imageUrl; // Get the image URL from the response
         setMaterial(imageUrl); // Update the material state with the new image URL
@@ -106,7 +131,6 @@ export default function AdminWritingPage() {
         </h1>
       </header>
 
-
       {/* Show Material (Image URL) */}
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Material:</h3>
@@ -123,7 +147,34 @@ export default function AdminWritingPage() {
           <p className="text-center text-gray-600">No material available</p>
         )}
       </div>
-
+{/* ONLY NEW UI ADDITION */}
+<div className="bg-white shadow-md rounded-md p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Test Type</label>
+            <select
+              value={testType}
+              onChange={(e) => setTestType(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 w-full"
+            >
+              <option value="Academic">Academic</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+            <select
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 w-full"
+            >
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Select Task</h3>
@@ -184,7 +235,11 @@ export default function AdminWritingPage() {
           disabled={isUploading}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {isUploading ? "Saving..." : material ? "Update Image" : "Upload Image"}
+          {isUploading
+            ? "Saving..."
+            : material
+            ? "Update Image"
+            : "Upload Image"}
         </button>
       </div>
 
@@ -194,7 +249,9 @@ export default function AdminWritingPage() {
           disabled={isUploading}
           className="px-6 py-3 text-white text-lg font-bold rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
         >
-          {isUploading ? "Saving..." : `Save (${selectedPart}) Test No: ${testId}`}
+          {isUploading
+            ? "Saving..."
+            : `Save (${selectedPart}) Test No: ${testId}`}
         </button>
         <Link
           href="/admin/tests/writing/main"
