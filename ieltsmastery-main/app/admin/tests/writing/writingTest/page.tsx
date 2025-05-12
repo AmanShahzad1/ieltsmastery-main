@@ -8,6 +8,7 @@ import {
   fetchWritingTestType,
   saveWritingTestType,
 } from "../../../../../api/writing";
+import { updatePlanWithTest } from "../../../../../api/plans";
 import Link from "next/link";
 
 export default function AdminWritingPage() {
@@ -108,6 +109,8 @@ export default function AdminWritingPage() {
       );
           // NEW: Save type/difficulty (non-blocking)
       await saveWritingTestType(testId as string, testType, difficulty);
+      const res = await updatePlanWithTest(testId, difficulty, 'writing');  
+            if (res.success) console.log("Plan updated:", res.updatedPlans);
       if (response.success) {
         const imageUrl = response.imageUrl; // Get the image URL from the response
         setMaterial(imageUrl); // Update the material state with the new image URL

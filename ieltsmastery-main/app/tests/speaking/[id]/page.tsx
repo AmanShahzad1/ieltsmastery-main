@@ -9,13 +9,17 @@ import {
   FaMicrophone,
   FaPlay,
 } from "react-icons/fa";
-import { fetchSpeakingData, saveSpeakingAnswer } from "../../../api/speaking";
+import { jwtDecode } from "jwt-decode";
+import { useParams } from "next/navigation";
+import { fetchSpeakingData, saveSpeakingAnswer } from "../../../../api/speaking";
+import { updateUserPerformance } from "../../../../api/performance";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import axios from "axios";
 import Link from "next/link";
 
 export default function SpeakingTestPage() {
   // Existing state declarations (unchanged)
+  const params = useParams();
   const [showQuestion, setShowQuestion] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(1);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -44,7 +48,7 @@ export default function SpeakingTestPage() {
   } | null>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
 
-  const testId = "16";
+  const testId = params.id as string; 
 
   // Original instructions array (unchanged)
   const instructions = [
@@ -104,6 +108,30 @@ export default function SpeakingTestPage() {
   //   setEvaluation(response.data);
   //   console.log(response.data);
   // };
+ const updateTestPerformance = async () => {
+     try {
+       console.log("Attempting to update performance...");
+       const token = localStorage.getItem("token");
+       if (!token) {
+         console.error("No token found");
+         return false;
+       }
+ 
+       const decoded = jwtDecode<{ userId: number }>(token);
+       const testType = window.location.pathname.split("/")[2];
+       console.log(
+         `Updating performance for user ${decoded.userId}, test ${testId}, type ${testType}`
+       );
+ 
+       await updateUserPerformance(decoded.userId, testId, testType);
+       console.log("Performance updated successfully");
+       return true;
+     } catch (error) {
+       console.error("Error updating performance:", error);
+       return false;
+     }
+   };
+   
   const saveRecording = async (audioBlob: Blob) => {
     setIsEvaluating(true); // Start loading
     try {
@@ -124,18 +152,29 @@ export default function SpeakingTestPage() {
 
       const bandScoreMatch = evaluation.match(/Overall Band Score: (\d)/);
       const score = bandScoreMatch ? parseInt(bandScoreMatch[1], 10) : 0; // Default to 0 if no score is found
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
+
+      const decoded = jwtDecode<{ userId: number }>(token);
+      const userId = decoded.userId;
+      
       await saveSpeakingAnswer({
                 testId,
                 questionId: questions[questionNumber - 1]?.id || "", // Dynamic questionId from the questions array
                 userAnswer: transcript,
                 score, // Use the extracted band score
-                feedback: evaluation
+                feedback: evaluation,
+                userId
               });
-      
+    
     } catch (error) {
       console.error("Evaluation error:", error);
     } finally {
       setIsEvaluating(false); // Stop loading regardless of success/error
+      
     }
   };
 
@@ -225,6 +264,7 @@ export default function SpeakingTestPage() {
       moveToNextPart();
     } else {
       setIsTestComplete(true);
+      await updateTestPerformance();
     }
   };
 

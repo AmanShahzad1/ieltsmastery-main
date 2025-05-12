@@ -1,15 +1,21 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
-import { fetchListeningData } from "../../../api/listening"; // Use the same API function as the admin side
+import { fetchListeningData } from "../../../../api/listening"; // Use the same API function as the admin side
+import { updateUserPerformance } from "../../../../api/performance";
 import axios from "axios"; // Import axios for API calls
 import Link from "next/link";
 
 export default function ListeningTest() {
+  const params = useParams();
   const [timeUsed, setTimeUsed] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes total for all parts
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [questions, setQuestions] = useState<{ type: string; question: string; answer: string; id: string }[]>([]); // Added `id` for question identification
+  const [questions, setQuestions] = useState<
+    { type: string; question: string; answer: string; id: string }[]
+  >([]); // Added `id` for question identification
   const [part, setPart] = useState(1);
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null); // For fetched audio URL
@@ -18,7 +24,7 @@ export default function ListeningTest() {
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({}); // Track user answers by question ID
   const audioRef = useRef<HTMLAudioElement>(null);
   const [time, setTime] = useState(0);
-  const testId = "1"; // Replace with dynamic test ID if needed
+  const testId = params.id as string;
 
   // Fetch listening test data (audio, image, and questions) for the selected part
   useEffect(() => {
@@ -94,17 +100,29 @@ export default function ListeningTest() {
 
   // Save user answers to the backend
   const saveAnswers = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      return false;
+    }
+
+    const decoded = jwtDecode<{ userId: number }>(token);
+    const userId = decoded.userId;
     try {
       // Loop through all questions and save answers
       for (const question of questions) {
         const userAnswer = userAnswers[question.id] || ""; // Get the user's answer (default to empty string if not answered)
-        await axios.post("http://localhost:5000/api/tests/saveListeningAnswer", {
-          testId: testId,
-          questionId: question.id,
-          userAnswer: userAnswer,
-          partId: part,
-          correctAnswer: question.answer, // Assuming the correct answer is stored in the question object
-        });
+        await axios.post(
+          "http://localhost:5000/api/tests/saveListeningAnswer",
+          {
+            testId: testId,
+            questionId: question.id,
+            userAnswer: userAnswer,
+            partId: part,
+            correctAnswer: question.answer, // Assuming the correct answer is stored in the question object
+            userId: userId,
+          }
+        );
       }
       console.log("Answers saved successfully!");
     } catch (error) {
@@ -112,11 +130,38 @@ export default function ListeningTest() {
       alert("An error occurred while saving your answers. Please try again.");
     }
   };
+  const updateTestPerformance = async () => {
+    try {
+      console.log("Attempting to update performance...");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
+
+      const decoded = jwtDecode<{ userId: number }>(token);
+      const testType = window.location.pathname.split("/")[2];
+      console.log(
+        `Updating performance for user ${decoded.userId}, test ${testId}, type ${testType}`
+      );
+
+      await updateUserPerformance(decoded.userId, testId, testType);
+      console.log("Performance updated successfully");
+      return true;
+    } catch (error) {
+      console.error("Error updating performance:", error);
+      return false;
+    }
+  };
 
   // Load the next part of the test
   const loadNextPart = async () => {
     // Save answers before moving to the next part
-    await saveAnswers();
+
+    const success = await saveAnswers();
+    
+
+
 
     if (part < 4) {
       setPart(part + 1);
@@ -127,16 +172,23 @@ export default function ListeningTest() {
       }
     } else {
       setIsTestComplete(true);
+      await updateTestPerformance();
     }
   };
 
   // End the test manually
   const endTest = async () => {
     // Show confirmation prompt
-    const isConfirmed = confirm("Are you sure you want to end the test? Your progress will be saved, but you won't be able to resume.");
+    const isConfirmed = confirm(
+      "Are you sure you want to end the test? Your progress will be saved, but you won't be able to resume."
+    );
     if (isConfirmed) {
       // Save answers before ending the test
-      await saveAnswers();
+
+      const success = await saveAnswers();
+      
+
+      await updateTestPerformance();
 
       setIsTimerRunning(false); // Stop the timer
       setIsTestComplete(true); // Mark the test as complete
@@ -157,8 +209,14 @@ export default function ListeningTest() {
     <ProtectedRoute>
       <div className="min-h-screen bg-[#e8f1ff] p-8 font-serif">
         <header className="flex flex-col sm:flex-row items-center sm:justify-between mb-6">
-          <img src="/logo.png" alt="IELTS Mastery Solutions Logo" className="h-28 w-28" />
-          <h1 className="text-2xl font-bold sm:ml-4 text-center w-full">Listening Test</h1>
+          <img
+            src="/logo.png"
+            alt="IELTS Mastery Solutions Logo"
+            className="h-28 w-28"
+          />
+          <h1 className="text-2xl font-bold sm:ml-4 text-center w-full">
+            Listening Test
+          </h1>
         </header>
 
         {!isTestComplete ? (
@@ -215,7 +273,9 @@ export default function ListeningTest() {
 
             {/* Questions Section */}
             <div className="bg-white shadow-md rounded-md p-6 w-full mt-6">
-              <h3 className="text-lg font-bold mb-4">Questions - Part {part}</h3>
+              <h3 className="text-lg font-bold mb-4">
+                Questions - Part {part}
+              </h3>
               <div className="space-y-6">
                 {questions.map((question, index) => (
                   <div key={question.id}>
@@ -227,7 +287,9 @@ export default function ListeningTest() {
                       className="border border-gray-300 rounded-md p-2 w-full"
                       placeholder="Your answer..."
                       value={userAnswers[question.id] || ""}
-                      onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                      onChange={(e) =>
+                        handleAnswerChange(question.id, e.target.value)
+                      }
                     />
                   </div>
                 ))}
@@ -245,7 +307,9 @@ export default function ListeningTest() {
         ) : (
           <div className="text-center mt-8">
             <h2 className="text-2xl font-bold">Test Complete!</h2>
-            <p className="text-lg mt-4">You have completed all parts of the Listening Test.</p>
+            <p className="text-lg mt-4">
+              You have completed all parts of the Listening Test.
+            </p>
             <Link href="/pages/dashboard">
               <button className="mt-4 bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-blue-600">
                 Return to Dashboard

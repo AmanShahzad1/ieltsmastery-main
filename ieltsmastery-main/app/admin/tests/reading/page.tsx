@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchPartData, savePartData, fetchTestType, saveTestType } from "../../../../api/tests";
+import { updatePlanWithTest } from "../../../../api/plans";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -58,6 +59,8 @@ export default function AdminReadingPage() {
       
       // NEW: Save type/difficulty (non-blocking)
       await saveTestType(testId as string, testType, difficulty);
+      const res = await updatePlanWithTest(testId, difficulty, 'reading');  
+      if (res.success) console.log("Plan updated:", res.updatedPlans); 
       
       if (partResponse.success) {
         alert("Data saved successfully");

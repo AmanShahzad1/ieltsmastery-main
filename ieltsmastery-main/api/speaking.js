@@ -69,15 +69,16 @@ export const saveSpeakingData = async (testId, partName, questions) => {
   }
 };
 
-export const saveSpeakingAnswer = async ({ testId, questionId, userAnswer, score, feedback }) => {
+export const saveSpeakingAnswer = async ({ testId, questionId, userAnswer, score, feedback, userId }) => {
     try {
-      console.log("Trying to save", testId, questionId, userAnswer, score, feedback)
+      console.log("Trying to save", testId, questionId, userAnswer, score, feedback, userId)
       const response = await axios.post(`${BASE_URL}/speaking/saveSpeakingAnswer`, {
         testId,
         questionId,
         userAnswer,
         score,
-        feedback
+        feedback,
+        userId
       });
       return response.data;
     } catch (error) {

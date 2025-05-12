@@ -7,6 +7,7 @@ import {
   fetchListeningTestType,
   saveListeningTestType,
 } from "../../../../api/listening";
+import { updatePlanWithTest } from "../../../../api/plans";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
@@ -122,6 +123,8 @@ export default function AdminListeningPage() {
         finalImageUrl
       );
       await saveListeningTestType(testId as string, difficulty);
+      const res = await updatePlanWithTest(testId, difficulty, 'listening');  
+      if (res.success) console.log("Plan updated:", res.updatedPlans); 
       if (!saveResponse.success) {
         throw new Error(saveResponse.error || "Save failed");
       }

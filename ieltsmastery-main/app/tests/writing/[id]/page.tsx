@@ -1,12 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { fetchWritingPartData, saveWritingAnswer, getFeedbackFromFlask, saveWritingLLMResponse} from "../../../api/writing"; // Adjust the import path as needed
+import { fetchWritingPartData, saveWritingAnswer, getFeedbackFromFlask, saveWritingLLMResponse} from "../../../../api/writing"; // Adjust the import path as needed
+import { updateUserPerformance } from "../../../../api/performance";
 import axios from "axios"; // For error handling
+import { useParams } from "next/navigation";
 
 const WritingTest = () => {
+  const params = useParams();
   const [wordCount, setWordCount] = useState(0);
   const [inputText, setInputText] = useState("");
   const [timeRemaining, setTimeRemaining] = useState(3600); // 60 minutes in seconds
@@ -20,7 +24,7 @@ const WritingTest = () => {
   const [hasStarted, setHasStarted] = useState(false); // Track if the test has started
 
   const searchParams = useSearchParams();
-  const testId = searchParams.get("testId") || "1"; // Fallback to "1" if testId is not provided
+  const testId = params.id as string; // Fallback to "1" if testId is not provided
 
   // Fetch writing task and material based on testId and taskType
   useEffect(() => {
@@ -87,6 +91,31 @@ const WritingTest = () => {
     setIsTimerRunning(true); // Start the timer
   };
 
+
+  const updateTestPerformance = async () => {
+    try {
+      console.log("Attempting to update performance...");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
+
+      const decoded = jwtDecode<{ userId: number }>(token);
+      const testType = window.location.pathname.split("/")[2];
+      console.log(
+        `Updating performance for user ${decoded.userId}, test ${testId}, type ${testType}`
+      );
+
+      await updateUserPerformance(decoded.userId, testId, testType);
+      console.log("Performance updated successfully");
+      return true;
+    } catch (error) {
+      console.error("Error updating performance:", error);
+      return false;
+    }
+  };
+  
   // Save the user's response to the database
   const saveResponse = async () => {
     try {
@@ -102,6 +131,16 @@ const WritingTest = () => {
       const bandScoreMatch = feedback.match(/Overall Band Score: (\d)/);
       const score = bandScoreMatch ? parseInt(bandScoreMatch[1], 10) : 0; // Default to 0 if no score is found
   
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
+
+      const decoded = jwtDecode<{ userId: number }>(token);
+      const userId = decoded.userId;
+      
       // Save the response to your backend
       for (const question of questions) {
         await saveWritingAnswer({
@@ -110,6 +149,7 @@ const WritingTest = () => {
           userAnswer: inputText,
           partId,
           score, // Use the extracted band score
+          userId
         });
         
         // Save the complete feedback and score using saveWritingLLMResponse
@@ -121,7 +161,7 @@ const WritingTest = () => {
           score, // Extracted band score
         });
       }
-  
+      
       console.log("Response saved successfully!");
     } catch (error) {
       console.error("Error saving response:", error);
@@ -138,6 +178,7 @@ const WritingTest = () => {
       setWordCount(0); // Reset the word count
     } else {
       setIsTestComplete(true); // End the test if Task 2 is completed
+      await updateTestPerformance();
     }
   };
 

@@ -8,6 +8,7 @@ import {
   fetchSpeakingTestType,
   saveSpeakingTestType,
 } from "../../../../api/speaking";
+import { updatePlanWithTest } from "../../../../api/plans";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -53,6 +54,7 @@ export default function AdminSpeakingPage() {
   const handleAddQuestion = () => {
     setQuestions([...questions, { question: "" }]);
   };
+  
 
   const handleSave = async () => {
     if (!testId) return;
@@ -62,6 +64,8 @@ export default function AdminSpeakingPage() {
       const response = await saveSpeakingData(testId, selectedPart, questions);
       // NEW: Save type/difficulty (non-blocking)
       await saveSpeakingTestType(testId as string, difficulty);
+      const res = await updatePlanWithTest(testId, difficulty, 'speaking');  
+      if (res.success) console.log("Plan updated:", res.updatedPlans);
       if (!response.success) {
         throw new Error(response.message || "Save failed");
       }
