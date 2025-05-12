@@ -90,15 +90,16 @@ export const saveWritingPartData = async (testId, partName, questions, formData)
     }
   }
 };
-export const saveWritingAnswer = async ({ testId, questionId, userAnswer, partId, score }) => {
+export const saveWritingAnswer = async ({ testId, questionId, userAnswer, partId, score, userId }) => {
     try {
-      console.log("Trying to save", testId, questionId, userAnswer, partId, score)
+      console.log("Trying to save", testId, questionId, userAnswer, partId, score, userId)
       const response = await axios.post(`${BASE_URL}/tests/writing/saveWritingAnswer`, {
         testId,
         questionId,
         userAnswer,
         partId,
         score,
+        userId
       });
       return response.data;
     } catch (error) {

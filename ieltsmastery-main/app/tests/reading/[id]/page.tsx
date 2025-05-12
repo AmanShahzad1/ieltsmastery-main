@@ -1,11 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
-import { fetchPartData } from "../../../api/tests";
+import { fetchPartData } from "../../../../api/tests";
+import { updateUserPerformance } from "../../../../api/performance";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
 export default function Home() {
+  const params = useParams();
   const [isBlurred, setIsBlurred] = useState(true);
   const [time, setTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -20,8 +24,7 @@ export default function Home() {
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
   const [hasStartedPart, setHasStartedPart] = useState(false);
   const [showSubmitConfirmation, setShowSubmitConfirmation] = useState(false);
-
-  const testId = "1";
+  const testId = params.id as string;
 
   // Fetch Part Data
   const loadPartData = async (part: number) => {
@@ -80,6 +83,14 @@ export default function Home() {
   // Submit Answers for Current Part
   const submitPart = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
+
+      const decoded = jwtDecode<{ userId: number }>(token);
+      const userId = decoded.userId;
       for (const question of questions) {
         if (userAnswers[question.id]) {
           await axios.post("http://localhost:5000/api/tests/saveUserAnswer", {
@@ -88,6 +99,7 @@ export default function Home() {
             userAnswer: userAnswers[question.id],
             partId: part,
             correctAnswer: question.answer,
+            userId: userId
           });
         }
       }
@@ -97,15 +109,43 @@ export default function Home() {
       return false;
     }
   };
+  const updateTestPerformance = async () => {
+    try {
+      console.log("Attempting to update performance...");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
 
+      const decoded = jwtDecode<{ userId: number }>(token);
+      const testType = window.location.pathname.split("/")[2];
+      console.log(
+        `Updating performance for user ${decoded.userId}, test ${testId}, type ${testType}`
+      );
+
+      await updateUserPerformance(decoded.userId, testId, testType);
+      console.log("Performance updated successfully");
+      return true;
+    } catch (error) {
+      console.error("Error updating performance:", error);
+      return false;
+    }
+  };
   // Handle Test Submission
   const handleTestSubmission = async () => {
+    console.log("Starting test submission...");
     const success = await submitPart();
-    if (success) {
-      setIsTestComplete(true);
-      setIsTimerRunning(false);
-      setShowSubmitConfirmation(false);
+    if (!success) {
+      console.error("Failed to submit part");
+      return;
     }
+
+    await updateTestPerformance();
+    setIsTestComplete(true);
+    setIsTimerRunning(false);
+    setShowSubmitConfirmation(false);
+    console.log("Test submission completed");
   };
 
   // End Test Early
@@ -114,9 +154,24 @@ export default function Home() {
       "Are you sure you want to end the test? Your progress will be saved, but you won't be able to resume."
     );
     if (isConfirmed) {
-      await submitPart();
-      setIsTestComplete(true);
-      setIsTimerRunning(false);
+      const success = await submitPart();
+      if (success) {
+        try {
+          const token = localStorage.getItem("token");
+          if (token) {
+            const decoded = jwtDecode<{ userId: number }>(token);
+            // Determine test type based on current page
+            const testType = window.location.pathname.split("/")[2]; // gets 'reading', 'writing', etc.
+            await updateUserPerformance(decoded.userId, testId, testType);
+          }
+        } catch (error) {
+          console.error("Error updating performance:", error);
+        }
+
+        setIsTestComplete(true);
+        setIsTimerRunning(false);
+        setShowSubmitConfirmation(false);
+      }
     }
   };
 
@@ -259,11 +314,20 @@ export default function Home() {
                   const isConfirmed = confirm(
                     "Are you sure you want to end the test? Your progress will be saved, but you won't be able to resume."
                   );
-                  if (isConfirmed) {
-                    await submitPart();
-                    setIsTestComplete(true);
-                    setIsTimerRunning(false);
+                  if (!isConfirmed) return;
+
+                  console.log("Ending test early...");
+                  const success = await submitPart();
+                  if (!success) {
+                    console.error("Failed to submit part");
+                    return;
                   }
+
+                  await updateTestPerformance();
+                  setIsTestComplete(true);
+                  setIsTimerRunning(false);
+                  setShowSubmitConfirmation(false);
+                  console.log("Test ended early successfully");
                 }}
                 className="px-6 py-3 bg-gray-500 text-white text-lg font-bold rounded-md hover:bg-gray-600 w-full sm:w-64"
               >
