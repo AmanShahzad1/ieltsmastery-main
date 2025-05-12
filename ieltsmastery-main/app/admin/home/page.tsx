@@ -43,7 +43,7 @@ export default function AdminDashboard() {
           {/* Users Management */}
           <div
             className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300 cursor-pointer"
-            onClick={() => navigateTo("/admin/users")}
+            onClick={() => navigateTo("/admin/manage_users")}
           >
             <div className="w-24 h-24 bg-[#03036D] rounded-full flex items-center justify-center mx-auto">
               <FaRegUserCircle className="text-white w-16 h-16" />
