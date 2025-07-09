@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { saveWritingPartData, fetchWritingPartData } from "../../../../../api/writing"; 
 import Link from "next/link";
-
+import Image from "next/image"; // Import Image component for image preview
 export default function AdminWritingPage() {
   const [questions, setQuestions] = useState<{ question: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Task 1");
@@ -112,7 +112,7 @@ export default function AdminWritingPage() {
         <h3 className="text-lg font-bold mb-4 text-center">Material:</h3>
         {material ? (
           <div className="text-center">
-            <img
+            <Image
               src={material}
               alt="Uploaded Material"
               className="w-48 h-48 object-cover mx-auto rounded-md"

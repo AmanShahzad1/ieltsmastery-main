@@ -4,13 +4,14 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchListeningData, saveListeningData } from "../../../../api/listening";
 import Link from "next/link";
-
+import Image from "next/image"; // Import Image component for image preview
 export default function AdminListeningPage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null); // For fetched audio URL
   const [imageUrl, setImageUrl] = useState<string | null>(null); // For fetched image URL (single value)
   const [questions, setQuestions] = useState<{ type: string; question: string; answer: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Part 1");
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  /* eslint-disable react/no-unescaped-entities */
+
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
   const [audioFile, setAudioFile] = useState<File | null>(null); // For uploaded audio file
@@ -153,7 +154,7 @@ export default function AdminListeningPage() {
           <>
             <div className="mt-4">
               <p className="text-sm text-gray-600">Preview:</p>
-              <img
+              <Image
                 src={imageUrl}
                 alt="Preview"
                 className="w-24 h-24 object-cover rounded-md"

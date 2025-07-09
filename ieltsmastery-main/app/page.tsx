@@ -1,11 +1,11 @@
-
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState } from "react";
 import './styles/global.css';
 import Head from "next/head";
 import Link from "next/link";
-
+import Image from "next/image";
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("writing"); // For AI features demo
@@ -27,7 +27,7 @@ export default function Home() {
       <header className="bg-gray-50 shadow">
         <div className="container mx-auto flex items-center justify-between p-5">
           <div className="flex items-center">
-            <img src="/logo.png" alt="IELTS Mastery Solutions Logo" className="w-16 sm:w-20" />
+            <Image src="/logo.png" alt="IELTS Mastery Solutions Logo" className="w-16 sm:w-20" />
             <h1 className="ml-3 text-lg sm:text-xl font-bold" style={{ color: "#03036D" }}>IELTS Mastery</h1>
           </div>
           <div className="flex items-center space-x-4">

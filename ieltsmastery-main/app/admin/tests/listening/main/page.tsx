@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchListeningTests, createListeningTest } from "../../../../../api/listening"; // Import API functions
 import Link from "next/link"; // Use next/link for client-side navigation
+import Image from "next/image"; // Import Image component for logo
 // Define the structure of a test object
 interface Test {
   id: number;
@@ -47,7 +48,7 @@ export default function ListeningTestMainPage() {
       {/* Header */}
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
         <div className="flex items-center mr-6 sm:mr-4">
-          <img
+          <Image
             src="/logo.png"
             alt="IELTS Mastery Solutions Logo"
             className="h-28 w-28"

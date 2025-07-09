@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
 import { loginAdmin } from "@/api/auth"; // Import the admin login API function
-
+import Image from "next/image";
 export default function AdminLoginPage() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
@@ -35,7 +34,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-10 max-w-4xl w-full">
         <div className="text-center mb-6">
-          <img src="/Logo.png" alt="Admin Logo" className="mx-auto w-20" />
+          <Image src="/Logo.png" alt="Admin Logo" className="mx-auto w-20" />
           <h1 className="text-2xl font-bold text-blue-900">Admin Login</h1>
         </div>
         <form onSubmit={handleSubmit}>

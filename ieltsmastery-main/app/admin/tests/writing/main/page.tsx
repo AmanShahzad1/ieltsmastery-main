@@ -1,9 +1,10 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { fetchWritingTests, createWritingTest } from "../../../../../api/writing"; // Use functions from api/writing.js
 import Link from "next/link";
-
+import Image from "next/image";
 interface Test {
   id: number;
   name: string;
@@ -63,7 +64,7 @@ const getTests = async () => {
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
         <div className="flex items-center mr-6 sm:mr-4">
-          <img src="/logo.png" alt="IELTS Mastery Solutions Logo" className="h-28 w-28" />
+          <Image src="/logo.png" alt="IELTS Mastery Solutions Logo" className="h-28 w-28" />
         </div>
         <h1 className="text-2xl font-bold sm:ml-4 mt-4 sm:mt-0 text-center w-full">Writing Tests</h1>
       </header>
