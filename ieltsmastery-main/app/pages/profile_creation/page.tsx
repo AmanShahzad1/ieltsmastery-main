@@ -1,31 +1,29 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { registerUserProfile } from "@/api/auth";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-
- export default function RegisterPage() {
-
+export default function RegisterPage() {
+  const router = useRouter();
   const [userId, setUserId] = useState<number>();
-   useEffect(() => {
-       //debugger
-       if (typeof window !== "undefined") {
-         const token = localStorage.getItem("token");
-         if (token) {
-           try {
-             const decoded = jwtDecode<{ userId: number }>(token);
-             setUserId(decoded.userId || 16);
-           } catch (error) {
-             console.error("Error decoding token:", error);
-           }
-         }
-       }
-     }, []);
-
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const decoded = jwtDecode<{ userId: number }>(token);
+          setUserId(decoded.userId || 16);
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
-   // user_id: {userId},
     firstName: "",
     lastName: "",
     profilePic: null as File | null,
@@ -47,6 +45,28 @@ import { jwtDecode } from "jwt-decode";
     }
   };
 
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/tests/upload-image", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error("Image upload failed");
+      }
+
+      const data = await response.json();
+      return data.imageUrl;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -57,38 +77,38 @@ import { jwtDecode } from "jwt-decode";
     }
 
     try {
-     // debugger
-      await  registerUserProfile({
-        user_id: userId,  // Assuming user_id is obtained from the main users table
+      setIsSubmitting(true);
+      
+      let imageUrl = null;
+      if (formData.profilePic) {
+        const { imageUrl: uploadedUrl } = await uploadImage(formData.profilePic);
+        imageUrl = uploadedUrl;
+      }
+
+      await registerUserProfile({
+        user_id: userId,
         first_name: formData.firstName,
         last_name: formData.lastName,
-        profile_pic: formData.profilePic, // Should be a valid image path
+        profile_pic: imageUrl // Now passing the URL string
       });
-    
-      setSuccess("Profile creation successful!");
+
+      setSuccess("Profile created successfully!");
+      setTimeout(() => router.push("../tests/start_test"), 1500);
+      
     } catch (err: unknown) {
-      if (typeof err === "string") {
-        setError(err);
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred.");
-      }
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
       setIsSubmitting(false);
     }
-    
   };
 
   return (
     <div className="min-h-screen w-full bg-blue-50 flex flex-col items-center justify-center">
-      {/* Logo and Heading - Outside White Box */}
       <div className="text-center mb-6">
         <img src="/Logo.png" alt="IELTS Mastery Logo" className="mx-auto w-20" />
         <h1 className="text-2xl font-bold text-blue-900">Create Your Profile</h1>
       </div>
 
-      {/* White Box (Card) starts below the heading */}
       <div className="bg-white shadow-lg rounded-lg p-10 max-w-4xl w-full flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <input
@@ -125,15 +145,10 @@ import { jwtDecode } from "jwt-decode";
           </button>
           {error && <p className="text-red-600">{error}</p>}
           {success && <p className="text-green-600">{success}</p>}
-          <p>
-            Already have a profile <Link href="../tests/start_test" className="text-blue-600">GO TO Dashboard</Link>
-          </p>
         </form>
 
-        {/* Footer inside the white box */}
         <div className="mt-8 flex justify-between text-sm text-gray-600">
-          <a href="#" className="hover:underline">Privacy Policy</a>
-          <span>Copyright @IELTS Mastery 2024</span>
+          <span>Copyright @IELTS Mastery 2025</span>
         </div>
       </div>
     </div>

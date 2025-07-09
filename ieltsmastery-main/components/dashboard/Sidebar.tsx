@@ -44,8 +44,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems: NavigationItem[] = [
     { name: "Dashboard", icon: "/icons/category.png", route: "/pages/dashboard" },
-    { name: "Analytics", icon: "/icons/stats.png", route: "/analytics" },
-    { name: "Subscriptions", icon: "/icons/refund-alt.png", route: "/subscriptions" },
+    { name: "Analytics", icon: "/icons/stats.png", route: "/pages/analytics" },
+    
     {
       name: "Logout",
       icon: "/icons/logout.png",

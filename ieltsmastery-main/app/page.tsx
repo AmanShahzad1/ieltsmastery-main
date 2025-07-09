@@ -100,17 +100,17 @@ export default function Home() {
               href="/pages/login"
               className="bg-white text-blue-800 px-8 py-3 rounded-lg font-bold hover:bg-blue-100 transition"
             >
-              Start Free Trial
+              Start Your Journey!
             </Link>
-            <button className="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-blue-800 transition">
+            {/* <button className="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-blue-800 transition">
               See AI in Action
-            </button>
+            </button> */}
           </div>
         </div>
       </section>
 
       {/* Unique Value Proposition Section */}
-      <section className="py-16 bg-white">
+      <section id="features" className="py-16 bg-white">
         <div className="container mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-4xl font-bold text-blue-900 mb-4">
@@ -131,7 +131,7 @@ export default function Home() {
             <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
               <div className="text-blue-800 font-bold text-lg mb-3">📊 Dynamic Adaptation</div>
               <p className="text-gray-700">
-                Your study plan automatically adjusts based on your performance and feedback
+                Your study plan automatically adjusts based on your performance.
               </p>
             </div>
             <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
@@ -257,7 +257,7 @@ export default function Home() {
         </div>
       </section>
       <section className="py-16 bg-gray-50">
-  <div className="container mx-auto px-5">
+  <div id="about" className="container mx-auto px-5">
     <h2 className="text-3xl font-bold text-center text-blue-900 mb-12">
       Why Choose IELTS Mastery?
     </h2>
@@ -285,7 +285,7 @@ export default function Home() {
         </div>
         <h3 className="text-xl font-bold mb-3 text-gray-800">Smart Adaptive Learning</h3>
         <p className="text-gray-600">
-          Your study plan automatically adjusts based on performance analytics and feedback, focusing precisely on your weak areas.
+          Your study plan automatically adjusts based on performance analytics, focusing precisely on your weak areas.
         </p>
       </div>
 
@@ -452,6 +452,26 @@ export default function Home() {
                 ))}
               </div>
             </div>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">SI</div>
+                <div>
+                  <h4 className="font-bold">Samee Idrees</h4>
+                  <p className="text-sm text-gray-500">Improved from 6.5 to 8 in Writing</p>
+                </div>
+              </div>
+              <p className="text-gray-600">
+                "The system interaction is just like a tutor in a live class. I was able to learn consistently throughout my generated plan. I had coonfidence attempting the IELTS Exam."
+              </p>
+              <div className="mt-4 flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg key={star} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                ))}
+              </div>
+            </div>
+            
             
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex items-center mb-4">
@@ -463,6 +483,26 @@ export default function Home() {
               </div>
               <p className="text-gray-600">
                 "The personalized study plan was a game-changer. It adjusted automatically as I improved, always keeping me challenged but not overwhelmed."
+              </p>
+              <div className="mt-4 flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg key={star} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold mr-4">AA</div>
+                <div>
+                  <h4 className="font-bold">Asjid A.</h4>
+                  <p className="text-sm text-gray-500">Achieved 7.5 Overall</p>
+                </div>
+              </div>
+              <p className="text-gray-600">
+                "The AI-powered study plan completely transformed my preparation. It identified my weak areas in writing coherence and speaking errors."
               </p>
               <div className="mt-4 flex">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -489,7 +529,7 @@ export default function Home() {
             href="/pages/register"
             className="inline-block bg-white text-blue-800 px-8 py-3 rounded-lg font-bold hover:bg-blue-100 transition"
           >
-            Start Your 7-Day Free Trial
+            Start Your Journey with Ielts Mastery
           </Link>
         </div>
       </section>
@@ -497,21 +537,9 @@ export default function Home() {
       {/* Footer remains the same */}
           <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
       <div className="container mx-auto px-5">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Column 1 - Quick Links */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link href="/contact" className="hover:text-blue-400 transition">Contact Us</Link></li>
-              <li><Link href="/privacy" className="hover:text-blue-400 transition">Privacy Policy</Link></li>
-              <li><Link href="/sitemap" className="hover:text-blue-400 transition">Site Map</Link></li>
-              <li><Link href="/faq" className="hover:text-blue-400 transition">FAQs</Link></li>
-              <li><Link href="/terms" className="hover:text-blue-400 transition">Terms & Conditions</Link></li>
-              <li><Link href="/testimonials" className="hover:text-blue-400 transition">Testimonials</Link></li>
-              <li><Link href="/careers" className="hover:text-blue-400 transition">Careers</Link></li>
-            </ul>
-          </div>
-
+          
           {/* Column 2 - About Us */}
           <div>
             <h3 className="text-white font-bold text-lg mb-4">About Us</h3>
@@ -568,33 +596,6 @@ export default function Home() {
           <div>
             <h3 className="text-white font-bold text-lg mb-4">Recognized By</h3>
             <div className="grid grid-cols-2 gap-4">
-              {/* Cambridge Logo */}
-              <div className="bg-white p-2 rounded flex items-center justify-center">
-                <svg className="h-10" viewBox="0 0 100 40" fill="none">
-                  <path d="M20 0H0V40H20V0Z" fill="#A31F34"/>
-                  <path d="M40 0H20V40H40V0Z" fill="#1E6B52"/>
-                  <path d="M60 0H40V40H60V0Z" fill="#D4A413"/>
-                  <path d="M80 0H60V40H80V0Z" fill="#1E6B52"/>
-                  <path d="M100 0H80V40H100V0Z" fill="#A31F34"/>
-                  <text x="50" y="25" fontFamily="Arial" fontSize="12" fontWeight="bold" textAnchor="middle" fill="#1E6B52">CAMBRIDGE</text>
-                </svg>
-              </div>
-              
-              {/* British Council Logo */}
-              <div className="bg-blue-900 p-2 rounded flex items-center justify-center">
-                <svg className="h-10" viewBox="0 0 100 40" fill="none">
-                  <rect width="100" height="40" fill="#1D3F91"/>
-                  <text x="50" y="25" fontFamily="Arial" fontSize="14" fontWeight="bold" textAnchor="middle" fill="white">BRITISH COUNCIL</text>
-                </svg>
-              </div>
-              
-              {/* IDP Logo */}
-              <div className="bg-green-600 p-2 rounded flex items-center justify-center">
-                <svg className="h-10" viewBox="0 0 80 40" fill="none">
-                  <rect width="80" height="40" rx="4" fill="#00A651"/>
-                  <text x="40" y="25" fontFamily="Arial" fontSize="14" fontWeight="bold" textAnchor="middle" fill="white">IDP</text>
-                </svg>
-              </div>
               
               {/* National University Logo */}
               <div className="bg-blue-800 p-2 rounded flex items-center justify-center">

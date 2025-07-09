@@ -2,11 +2,9 @@
 import { useState } from "react";
 import { MdFacebook } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 // import { useRouter } from 'next/navigation';
-
-
-
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -15,6 +13,7 @@ export default function LoginPage() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,14 +21,12 @@ export default function LoginPage() {
     setFormData({ ...formData, [name]: value });
   };
 
-  
-  const handleGoogleLogin =()=>{
-    window.location.href = 'http://localhost:5000/auth/google';
-  }
-  const handleFacebookLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/facebook'; // Redirect to Facebook OAuth route
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:5000/auth/google";
   };
-  
+  const handleFacebookLogin = () => {
+    window.location.href = "http://localhost:5000/auth/facebook"; // Redirect to Facebook OAuth route
+  };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,7 +46,7 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
+        console.log(data);
         setSuccess("Login successful!");
         setError("");
         // You would ideally store the JWT token in localStorage or cookies
@@ -77,7 +74,9 @@ export default function LoginPage() {
             alt="IELTS Mastery Logo"
             className="mx-auto w-20"
           />
-          <h1 className="text-2xl font-bold text-blue-900">Login to Your Account</h1>
+          <h1 className="text-2xl font-bold text-blue-900">
+            Login to Your Account
+          </h1>
         </div>
 
         {/* Content Section */}
@@ -95,16 +94,25 @@ export default function LoginPage() {
               />
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Password"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer">
-                  👁️
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <FaEyeSlash size={20} />
+                  ) : (
+                    <FaEye size={20} />
+                  )}
+                </button>
               </div>
               <button
                 type="submit"
@@ -114,7 +122,9 @@ export default function LoginPage() {
               </button>
             </form>
             {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-            {success && <p className="mt-4 text-sm text-green-600">{success}</p>}
+            {success && (
+              <p className="mt-4 text-sm text-green-600">{success}</p>
+            )}
             <p className="mt-4 text-sm text-gray-700">
               Don’t have an account yet?{" "}
               <Link href="./register" className="text-blue-600 font-semibold">
@@ -129,37 +139,21 @@ export default function LoginPage() {
           </div>
 
           {/* Right Section */}
-                    
-          
 
-            
-          
-          <div className="flex-1 flex flex-col gap-4">
-            
+          <div className="flex-1 flex flex-col justify-center gap-4">
             <button
-             className="flex items-center justify-center border border-blue-500 text-blue-500 px-4 py-3 rounded-lg hover:bg-blue-50"
-              onClick={handleGoogleLogin}>
+              className="flex items-center justify-center border border-blue-500 text-blue-500 px-4 py-3 rounded-lg hover:bg-blue-50"
+              onClick={handleGoogleLogin}
+            >
               <FaGoogle size={24} color="blue" />
               <span className="ml-2">Log in with Google</span>
             </button>
-            
-            <button
-              className="flex items-center justify-center border border-blue-700 text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50"
-              onClick={handleFacebookLogin}>
-              <MdFacebook size={24} color="blue" />
-              <span className="ml-2">Log in with Facebook</span>
-            </button>
-            
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-8 flex justify-between text-sm text-gray-600">
-          <a href="#" className="hover:underline">
-            Privacy Policy
-          </a>
-          
-          <span>Copyright IELTS Mastery 2024</span>
+          <span>@Copyright IELTS Mastery 2025</span>
         </div>
       </div>
     </div>
