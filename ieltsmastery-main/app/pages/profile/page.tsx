@@ -100,8 +100,7 @@ export default function ProfilePage() {
 
         {/* Footer inside the white box */}
         <div className="mt-8 flex justify-between text-sm text-gray-600 w-full">
-          <a href="#" className="hover:underline">Privacy Policy</a>
-          <span>Copyright @IELTS Mastery 2024</span>
+          <span>Copyright @IELTS Mastery 2025</span>
         </div>
       </div>
     </div>

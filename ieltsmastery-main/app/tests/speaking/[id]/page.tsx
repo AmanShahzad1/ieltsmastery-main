@@ -169,7 +169,7 @@ export default function SpeakingTestPage() {
                 feedback: evaluation,
                 userId
               });
-    
+    await updateTestPerformance();
     } catch (error) {
       console.error("Evaluation error:", error);
     } finally {
@@ -184,6 +184,7 @@ export default function SpeakingTestPage() {
       "Are you sure you want to end the test? Your progress will be saved."
     );
     if (isConfirmed) {
+      await updateTestPerformance();
       setIsTestComplete(true);
       setTimerActive(false);
       if (recording) {

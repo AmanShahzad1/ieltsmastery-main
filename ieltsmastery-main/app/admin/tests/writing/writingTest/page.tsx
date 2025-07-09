@@ -14,106 +14,91 @@ import Link from "next/link";
 export default function AdminWritingPage() {
   const [questions, setQuestions] = useState<{ question: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Task 1");
-  const [imageFile, setImageFile] = useState<File | null>(null); // For uploaded image file
-  const [material, setMaterial] = useState<string>(""); // For fetched or uploaded image URL
-  const [isUploading, setIsUploading] = useState<boolean>(false); // To track image upload status
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [material, setMaterial] = useState<string>("");
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
 
-  //Plan Gen
-  // NEW STATE ONLY
   const [testType, setTestType] = useState<string>("Academic");
   const [difficulty, setDifficulty] = useState<string>("Intermediate");
 
-  // Fetch data whenever testId or selectedPart changes
   useEffect(() => {
     const fetchData = async () => {
       if (!testId) return;
 
-      console.log("Fetching data for:", { testId, selectedPart });
-
       try {
         const data = await fetchWritingPartData(testId, selectedPart);
-        console.log("Fetched data:", data);
-
         setQuestions(data.questions || []);
-        setMaterial(data.material || ""); // Set fetched image URL
+        setMaterial(data.material || "");
+
+        // Fetch test type and difficulty
+        const typeData = await fetchWritingTestType(testId);
+        if (typeData.type) setTestType(typeData.type);
+        if (typeData.difficulty) setDifficulty(typeData.difficulty);
       } catch (error) {
-        console.error("⚠️ Failed to fetch part data:", error);
+        console.error("Failed to fetch part data:", error);
         setQuestions([]);
         setMaterial("");
       }
-
-      // NEW: Separate call for type/difficulty (non-blocking)
-      fetchWritingTestType(testId)
-        .then((data) => {
-          if (data.type) setTestType(data.type);
-          if (data.difficulty) setDifficulty(data.difficulty);
-        })
-        .catch(() => {});
     };
 
     fetchData();
-  }, [testId, selectedPart]); // Runs when testId or selectedPart changes
+  }, [testId, selectedPart]);
 
-  // Handle part selection
   const handlePartSelection = (part: string) => {
     if (part !== selectedPart) {
       setSelectedPart(part);
     }
   };
 
-  // Handle adding a new question
   const handleAddQuestion = () => {
     setQuestions([...questions, { question: "" }]);
   };
 
-  // Handle saving the Writing Test data
   const handleSave = async () => {
     if (!testId) {
       alert("Test ID is missing");
       return;
     }
 
-    // Check if an image is selected for upload/update
-    if (!imageFile) {
-      if (material) {
-        alert("No image selected to update.");
-      } else {
-        alert("No image selected to upload.");
-      }
-      return;
-    }
-
-    setIsUploading(true); // Start loading state
+    setIsUploading(true);
 
     try {
-      // Create FormData object
       const formData = new FormData();
-
-      // Append image file
-      formData.append("image", imageFile);
-
-      // Append other data (questions, testId, partName)
+      
+      // Only append image if one was selected
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+      
       formData.append("testId", testId);
       formData.append("partName", selectedPart);
       formData.append("questions", JSON.stringify(questions));
+      
+      // Include existing material URL if no new file was selected
+      if (!imageFile && material) {
+        formData.append("material", material);
+      }
 
-      // Save Writing Test data (including image upload)
       const response = await saveWritingPartData(
         testId,
         selectedPart,
         questions,
         formData
       );
-          // NEW: Save type/difficulty (non-blocking)
-      await saveWritingTestType(testId as string, testType, difficulty);
+
+      await saveWritingTestType(testId, testType, difficulty);
       const res = await updatePlanWithTest(testId, difficulty, 'writing');  
             if (res.success) console.log("Plan updated:", res.updatedPlans);
+      
       if (response.success) {
-        const imageUrl = response.imageUrl; // Get the image URL from the response
-        setMaterial(imageUrl); // Update the material state with the new image URL
+        // Update material state if a new image URL was returned
+        if (response.imageUrl) {
+          setMaterial(response.imageUrl);
+        }
+        setImageFile(null); // Clear the file input after successful save
         alert("Data saved successfully!");
       } else {
         alert("Error saving data.");
@@ -122,7 +107,7 @@ export default function AdminWritingPage() {
       console.error("Error saving data:", error);
       alert("Failed to save data.");
     } finally {
-      setIsUploading(false); // End loading state
+      setIsUploading(false);
     }
   };
 
@@ -134,24 +119,28 @@ export default function AdminWritingPage() {
         </h1>
       </header>
 
-      {/* Show Material (Image URL) */}
+      {/* Material Display Section */}
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
-        <h3 className="text-lg font-bold mb-4 text-center">Material:</h3>
+        <h3 className="text-lg font-bold mb-4 text-center">Material</h3>
         {material ? (
           <div className="text-center">
             <img
               src={material}
-              alt="Uploaded Material"
-              className="w-48 h-48 object-cover mx-auto rounded-md"
+              alt="Writing Task Material"
+              className="max-w-full h-auto max-h-96 mx-auto rounded-md"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
-            <p className="text-sm text-gray-600 mt-2">Image URL: {material}</p>
+            <p className="text-sm text-gray-600 mt-2">Current Material</p>
           </div>
         ) : (
           <p className="text-center text-gray-600">No material available</p>
         )}
       </div>
-{/* ONLY NEW UI ADDITION */}
-<div className="bg-white shadow-md rounded-md p-4 mb-6">
+
+      {/* Test Type and Difficulty Selectors */}
+      <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Test Type</label>
@@ -179,6 +168,7 @@ export default function AdminWritingPage() {
         </div>
       </div>
 
+      {/* Task Selection */}
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Select Task</h3>
         <div className="flex justify-center space-x-4">
@@ -196,8 +186,17 @@ export default function AdminWritingPage() {
         </div>
       </div>
 
-      <div className="bg-white shadow-md rounded-md p-6">
-        <h3 className="text-lg font-bold mb-4">Questions</h3>
+      {/* Questions Section */}
+      <div className="bg-white shadow-md rounded-md p-6 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold">Questions</h3>
+          <button
+            onClick={handleAddQuestion}
+            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+          >
+            Add Question
+          </button>
+        </div>
         <div className="space-y-4">
           {questions.map((question, index) => (
             <input
@@ -206,59 +205,48 @@ export default function AdminWritingPage() {
               className="border border-gray-300 rounded-md p-2 w-full"
               value={question.question}
               onChange={(e) => {
-                const updatedQuestions = questions.map((q, i) =>
-                  i === index ? { question: e.target.value } : q
-                );
+                const updatedQuestions = [...questions];
+                updatedQuestions[index].question = e.target.value;
                 setQuestions(updatedQuestions);
               }}
               placeholder={`Question ${index + 1}`}
             />
           ))}
+          {questions.length === 0 && (
+            <p className="text-gray-500 text-center">No questions added yet</p>
+          )}
         </div>
-        <button
-          onClick={handleAddQuestion}
-          className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-        >
-          Add Question
-        </button>
       </div>
 
-      <div className="bg-white shadow-md rounded-md p-6 mt-6">
+      {/* Image Upload Section */}
+      <div className="bg-white shadow-md rounded-md p-6 mb-6">
         <h3 className="text-lg font-bold mb-4">
-          {material ? "Update Image" : "Upload Image"}
+          {material ? "Update Material Image" : "Upload Material Image"}
         </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          {material ? "Select a new image to update" : "Optional: Upload an image for this task"}
+        </p>
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImageFile(e.target.files?.[0] || null)}
           className="border border-gray-300 rounded-md p-2 w-full"
         />
-        <button
-          onClick={handleSave}
-          disabled={isUploading}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          {isUploading
-            ? "Saving..."
-            : material
-            ? "Update Image"
-            : "Upload Image"}
-        </button>
       </div>
 
-      <div className="flex justify-center mt-8">
+      {/* Save Buttons */}
+      <div className="flex justify-center gap-4 mt-8">
         <button
           onClick={handleSave}
           disabled={isUploading}
-          className="px-6 py-3 text-white text-lg font-bold rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
+          className="px-6 py-3 text-white text-lg font-bold rounded-md"
+          style={{ backgroundColor: "#03036D" }}
         >
-          {isUploading
-            ? "Saving..."
-            : `Save (${selectedPart}) Test No: ${testId}`}
+          {isUploading ? "Saving..." : `Save (${selectedPart}) Test No: ${testId}`}
         </button>
         <Link
           href="/admin/tests/writing/main"
-          className="ml-4 px-6 py-3 bg-gray-500 text-white text-lg font-bold rounded-md hover:bg-gray-600"
+          className="px-6 py-3 bg-gray-500 text-white text-lg font-bold rounded-md hover:bg-gray-600"
         >
           Go Back
         </Link>

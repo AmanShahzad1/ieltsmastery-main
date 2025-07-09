@@ -192,21 +192,15 @@ export default function RegisterPage() {
               <FaGoogle size={24} color="blue" />
               <span className="ml-2">Log In with Google</span>
             </button>
-            <button className="flex items-center justify-center border border-blue-700 text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50">
-              <MdFacebook size={24} color="blue" />
-              <span className="ml-2">Log In with Facebook</span>
-            </button>
+            
            
           </div>
         </form>
 
         {/* Footer */}
         <div className="mt-8 flex justify-between text-sm text-gray-600">
-          <a href="#" className="hover:underline">
-            Privacy Policy
-          </a>
           
-          <span>Copyright @IELTS Mastery 2024</span>
+          <span>Copyright @IELTS Mastery 2025</span>
         </div>
       </div>
     </div>

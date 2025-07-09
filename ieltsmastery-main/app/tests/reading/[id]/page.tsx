@@ -22,21 +22,32 @@ export default function Home() {
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [audioPlayed, setAudioPlayed] = useState(false);
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
-  const [hasStartedPart, setHasStartedPart] = useState(false);
+  const [hasStartedTest, setHasStartedTest] = useState(false);
   const [showSubmitConfirmation, setShowSubmitConfirmation] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
   const testId = params.id as string;
 
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins < 10 ? "0" : ""}${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+  
   // Fetch Part Data
   const loadPartData = async (part: number) => {
+    setIsLoading(true);
     try {
       const partName = `Part ${part}`;
       const data = await fetchPartData(testId, partName);
       setReadingMaterial(data.readingMaterial || "");
       setQuestions(data.questions || []);
-      setHasStartedPart(false);
-      setIsBlurred(true); // Always blur new parts until started
+      setImageUrl(data.readingimage || "");
+      setUserAnswers({});
     } catch (error) {
       console.error("Error fetching part data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,8 +65,8 @@ export default function Home() {
   }, [isTimerRunning]);
 
   // Start Test/Part
-  const startPart = () => {
-    if (part === 1 && !audioPlayed) {
+  const startTest = () => {
+    if (!audioPlayed) {
       const audioInstance = new Audio("/audio/Reading_Start.wav");
       setAudio(audioInstance);
       audioInstance.play();
@@ -63,12 +74,12 @@ export default function Home() {
         setIsBlurred(false);
         setIsTimerRunning(true);
         setAudioPlayed(true);
-        setHasStartedPart(true);
+        setHasStartedTest(true);
       });
     } else {
       setIsBlurred(false);
       setIsTimerRunning(true);
-      setHasStartedPart(true);
+      setHasStartedTest(true);
     }
   };
 
@@ -109,6 +120,7 @@ export default function Home() {
       return false;
     }
   };
+
   const updateTestPerformance = async () => {
     try {
       console.log("Attempting to update performance...");
@@ -132,10 +144,17 @@ export default function Home() {
       return false;
     }
   };
+
   // Handle Test Submission
   const handleTestSubmission = async () => {
     console.log("Starting test submission...");
     const success = await submitPart();
+    if (success) {
+      await updateTestPerformance();
+      setIsTestComplete(true);
+      setIsTimerRunning(false);
+      setShowSubmitConfirmation(false);
+    }
     if (!success) {
       console.error("Failed to submit part");
       return;
@@ -209,132 +228,172 @@ export default function Home() {
             className="h-28 w-28"
           />
           <h1 className="text-2xl font-bold sm:ml-4 text-center w-full">
-            Reading Test
+            Reading Test - Part {part}
           </h1>
         </header>
 
         {/* Timer and Start Button */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
           {/* Timer */}
-          <div className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md">
-            Time: {Math.floor(time / 60)}:{String(time % 60).padStart(2, "0")}
+          <div className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md text-center">
+            Time: {formatTime(time)}
           </div>
 
           {/* Start Button (only shown if part hasn't started) */}
-          {!hasStartedPart && (
+          {!hasStartedTest && (
             <button
               className="bg-blue-500 text-white font-semibold px-6 py-3 rounded-md shadow-md hover:bg-blue-600 w-full sm:w-48"
-              onClick={startPart}
+              onClick={startTest}
+              disabled={isLoading}
             >
-              {part === 1 ? "Get Started" : `Start Part ${part}`}
+              {isLoading ? "Loading..." : "Get Started"}
             </button>
           )}
         </div>
 
+        {/* Part Navigation */}
+        <div className="bg-white shadow-md rounded-md p-4 mb-6">
+          <h3 className="text-lg font-bold mb-4 text-center">Test Parts</h3>
+          <div className="flex justify-center space-x-4">
+            {[1, 2, 3].map((partNumber) => (
+              <button
+                key={partNumber}
+                className={`px-6 py-2 rounded-md border border-gray-300 text-center hover:bg-blue-100 ${
+                  part === partNumber ? "bg-blue-100" : ""
+                } ${!hasStartedTest ? "cursor-not-allowed opacity-50" : ""}`}
+                onClick={() => {
+                  if (hasStartedTest && part !== partNumber) {
+                    setPart(partNumber);
+                  }
+                }}
+                disabled={!hasStartedTest}
+              >
+                Part {partNumber}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Content Section */}
         {!isTestComplete && (
-          <>
-            <div className="flex flex-col lg:flex-row justify-center gap-6">
-              {/* Reading Material */}
-              <div className="bg-white shadow-md rounded-md p-6 w-full lg:w-1/2">
-                <h3 className="text-lg font-bold mb-4">Reading Material</h3>
-                <div
-                  className={`space-y-4 ${
-                    isBlurred ? "blur-sm" : "blur-none"
-                  } transition duration-300`}
-                >
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {readingMaterial}
-                  </p>
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Reading Material Section */}
+            <div className="bg-white shadow-md rounded-md p-6 w-full lg:w-1/2 h-full">
+              <h3 className="text-xl font-bold mb-4">Reading Material</h3>
+              
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
                 </div>
-              </div>
-
-              {/* Questions */}
-              <div className="bg-white shadow-md rounded-md p-6 w-full lg:w-1/2">
-                <h3 className="text-lg font-bold mb-4">
-                  Questions (Part {part})
-                </h3>
-                <div className="space-y-6">
-                  {questions.map((question, index) => (
-                    <div
-                      key={index}
-                      className={`${
-                        isBlurred ? "blur-sm" : "blur-none"
-                      } transition duration-300`}
-                    >
-                      <p className="text-sm font-medium mb-2">
-                        {index + 1}. {question.question}
-                      </p>
-                      <input
-                        type="text"
-                        className="border border-gray-300 rounded-md p-2 w-full"
-                        placeholder="Your answer..."
-                        disabled={isBlurred}
-                        value={userAnswers[question.id] || ""}
-                        onChange={(e) =>
-                          handleAnswerChange(question.id, e.target.value)
-                        }
+              ) : (
+                <>
+                  {/* Display image above reading material if available */}
+                  {imageUrl && (
+                    <div className={`mb-6 ${isBlurred ? "blur-sm" : ""}`}>
+                      <img
+                        src={imageUrl}
+                        alt="Reading Material Visual"
+                        className="max-w-full h-auto rounded-lg border border-gray-200 mx-auto"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Navigation Buttons */}
-            <div className="flex flex-col items-center mt-8 gap-4">
-              {hasStartedPart && (
-                <>
-                  {part < 4 ? (
-                    <button
-                      onClick={async () => {
-                        const success = await submitPart();
-                        if (success) {
-                          setPart(part + 1);
-                        }
-                      }}
-                      className="px-6 py-3 bg-green-500 text-white text-lg font-bold rounded-md hover:bg-green-600 w-full sm:w-64"
-                    >
-                      Submit & Continue to Part {part + 1}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setShowSubmitConfirmation(true)}
-                      className="px-6 py-3 bg-red-500 text-white text-lg font-bold rounded-md hover:bg-red-600 w-full sm:w-64"
-                    >
-                      Submit Test
-                    </button>
                   )}
+                  
+                  {/* Reading text content */}
+                  <div className={`prose max-w-none ${isBlurred ? "blur-sm" : ""}`}>
+                    {readingMaterial ? (
+                      <pre className="font-sans whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                        {readingMaterial}
+                      </pre>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">No reading material available</p>
+                    )}
+                  </div>
                 </>
               )}
+            </div>
 
-              {/* Return to Dashboard Button with warning prompt */}
+            {/* Questions Section */}
+            <div className="bg-white shadow-md rounded-md p-6 w-full lg:w-1/2">
+              <h3 className="text-xl font-bold mb-4">Questions</h3>
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {questions.length > 0 ? (
+                    questions.map((question, index) => {
+                      // Extract question number from the question text
+                      const questionNumberMatch = question.question.match(/Question (\d+)/);
+                      const questionNumber = questionNumberMatch ? questionNumberMatch[1] : index + 1;
+                      const questionText = question.question.replace(/^Question \d+:\s*/, '');
+                      
+                      return (
+                        <div
+                          key={question.id}
+                          className={`${isBlurred ? "blur-sm" : ""}`}
+                        >
+                          <p className="font-medium mb-2">
+                            {questionNumber}. {questionText}
+                          </p>
+                          <input
+                            type="text"
+                            className="border border-gray-300 rounded-md p-2 w-full"
+                            placeholder="Your answer..."
+                            disabled={isBlurred}
+                            value={userAnswers[question.id] || ""}
+                            onChange={(e) =>
+                              handleAnswerChange(question.id, e.target.value)
+                            }
+                          />
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">No questions available</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        {hasStartedTest && (
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+            {part < 3 && (
               <button
                 onClick={async () => {
-                  const isConfirmed = confirm(
-                    "Are you sure you want to end the test? Your progress will be saved, but you won't be able to resume."
-                  );
-                  if (!isConfirmed) return;
-
-                  console.log("Ending test early...");
                   const success = await submitPart();
-                  if (!success) {
-                    console.error("Failed to submit part");
-                    return;
+                  if (success) {
+                    setPart(part + 1);
                   }
-
-                  await updateTestPerformance();
-                  setIsTestComplete(true);
-                  setIsTimerRunning(false);
-                  setShowSubmitConfirmation(false);
-                  console.log("Test ended early successfully");
                 }}
-                className="px-6 py-3 bg-gray-500 text-white text-lg font-bold rounded-md hover:bg-gray-600 w-full sm:w-64"
+                className="px-6 py-3 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 w-full sm:w-auto"
               >
-                End Test & Return
+                Submit & Continue to Part {part + 1}
               </button>
-            </div>
-          </>
+            )}
+
+            {part === 3 && (
+              <button
+                onClick={() => setShowSubmitConfirmation(true)}
+                className="px-6 py-3 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 w-full sm:w-auto"
+              >
+                Submit Test
+              </button>
+            )}
+
+            <button
+              onClick={endTest}
+              className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 w-full sm:w-auto"
+            >
+              End Test & Return
+            </button>
+          </div>
         )}
 
         {/* Submit Confirmation Modal */}
@@ -355,7 +414,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={handleTestSubmission}
-                  className="px-4 py-2 bg-red-500 text-white rounded-md"
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
                   Submit Test
                 </button>

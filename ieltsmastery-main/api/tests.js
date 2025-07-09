@@ -83,36 +83,64 @@ export const createTest = async (testName) => {
 export const fetchPartData = async (testId, partName) => {
   try {
     const response = await axios.get(`${BASE_URL}/tests/${testId}/${partName}`);
-    console.log("Response", response);
-    return response.data; // Return the data from the response
-  } catch (error) {
-    // Check for known error structures, fallback to a generic error message
-    if (error.response && error.response.data) {
-      throw error.response.data.message || "Error fetching test part data.";
-    } else {
-      throw "An error occurred while fetching data. Please try again.";
-    }
+    
+    if (!response.data) throw new Error("No data received from server");
+    
+    // Ensure consistent field names
+    return {
+      questions: response.data.questions || [],
+      readingMaterial: response.data.material || response.data.readingMaterial || "",
+      readingimage: response.data.readingimage || ""
+    };
+  } catch (err) {
+    console.error("Error fetching reading part data:", err);
+    return { 
+      questions: [], 
+      readingMaterial: "", 
+      readingimage: "" 
+    };
   }
 };
 
 // Save test part data (questions and reading material)
-export const savePartData = async (testId, partName, questions, readingMaterial) => {
+export const savePartData = async (formData) => {
   try {
- 
-    const response = await axios.post(`${BASE_URL}/tests/${testId}/${partName}`, {
-      testId,
-      partName,
-      questions,
-      readingMaterial,
-    });
-    return response.data; // Return the server response
-  } catch (error) {
-    // Check for known error structures, fallback to a generic error message
-    if (error.response && error.response.data) {
-      throw error.response.data.message || "Error saving test part data.";
-    } else {
-      throw "An error occurred while saving data. Please try again.";
+    let readingimage = null;
+    
+    // Handle image upload first if present
+    if (formData.get("image")) {
+      const imageFormData = new FormData();
+      imageFormData.append("file", formData.get("image"));
+      
+      const imageRes = await axios.post(`${BASE_URL}/tests/upload-reading-image`, imageFormData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      readingimage = imageRes.data.readingimage;
     }
+
+    // Prepare save data
+    const saveData = {
+      testId: formData.get("testId"),
+      partName: formData.get("partName"),
+      questions: JSON.parse(formData.get("questions")),
+      readingMaterial: formData.get("readingMaterial"),
+      readingimage: readingimage || formData.get("readingimage") || ""
+    };
+
+    // Save all data
+    const response = await axios.post(`${BASE_URL}/tests/reading/save`, saveData);
+    
+    if (!response.data.success) {
+      throw new Error(response.data.error || "Failed to save reading part");
+    }
+
+    return {
+      success: true,
+      readingimage: response.data.readingimage || readingimage
+    };
+  } catch (error) {
+    console.error("Full save error:", error);
+    throw error.response?.data?.message || error.message || "Error saving data";
   }
 };
 
