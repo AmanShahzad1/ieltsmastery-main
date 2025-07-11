@@ -5,6 +5,7 @@ import { fetchStartingTest, submitStartingTestAnswer } from "../../../api/tests"
 import { assignPlanToUser, getUserPlan } from "../../../api/plans";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
+import Image from 'next/image';
 
 const StartTest = () => {
   const [questions, setQuestions] = useState<any[]>([]);
@@ -157,7 +158,7 @@ const StartTest = () => {
       <div className="min-h-screen bg-blue-50 flex flex-col p-6">
         <div className="flex justify-start items-center mb-12">
           <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+            <Image src="/logo.png" alt="Logo" className="h-16 w-auto" />
             <h1 className="text-2xl font-bold text-gray-800">IELTS Placement Test</h1>
           </div>
         </div>
@@ -200,7 +201,7 @@ const StartTest = () => {
     <div className="min-h-screen bg-blue-50 flex flex-col p-6">
       <div className="flex justify-start items-center mb-12">
         <div className="flex items-center space-x-2">
-          <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+          <Image src="/logo.png" alt="Logo" className="h-16 w-auto" />
           <h1 className="text-2xl font-bold text-gray-800">IELTS Placement Test</h1>
         </div>
       </div>

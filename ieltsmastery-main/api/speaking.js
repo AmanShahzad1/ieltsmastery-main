@@ -69,7 +69,7 @@ export const saveSpeakingData = async (testId, partName, questions) => {
   }
 };
 
-export const saveSpeakingAnswer = async ({ testId, questionId, userAnswer, score, feedback, userId }) => {
+export const saveSpeakingAnswer = useCallback(async ({ testId, questionId, userAnswer, score, feedback, userId }) => {
     try {
       console.log("Trying to save", testId, questionId, userAnswer, score, feedback, userId)
       const response = await axios.post(`${BASE_URL}/speaking/saveSpeakingAnswer`, {
@@ -84,7 +84,7 @@ export const saveSpeakingAnswer = async ({ testId, questionId, userAnswer, score
     } catch (error) {
       throw error.response?.data?.message || "Error saving writing answer.";
     }
-  };
+  },[]);
 
 
 export const fetchSpeakingTestType = async (testId) => {

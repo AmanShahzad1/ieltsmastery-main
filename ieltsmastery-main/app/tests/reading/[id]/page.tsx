@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useCallback} from "react";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import { fetchPartData } from "../../../../api/tests";
 import { updateUserPerformance } from "../../../../api/performance";
@@ -7,12 +7,15 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import Image from 'next/image';
 
+/* eslint-disable react/no-unescaped-entities */
 export default function Home() {
   const params = useParams();
   const [isBlurred, setIsBlurred] = useState(true);
   const [time, setTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [readingMaterial, setReadingMaterial] = useState<string>("");
   const [questions, setQuestions] = useState<
@@ -35,7 +38,7 @@ export default function Home() {
   };
   
   // Fetch Part Data
-  const loadPartData = async (part: number) => {
+  const loadPartData = useCallback(async (part: number) => {
     setIsLoading(true);
     try {
       const partName = `Part ${part}`;
@@ -49,7 +52,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  },[testId]);
 
   // Timer logic (total time only)
   useEffect(() => {
@@ -196,8 +199,9 @@ export default function Home() {
 
   // Load initial part data
   useEffect(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
     loadPartData(part);
-  }, [part]);
+  }, [part,loadPartData]);
 
   // Clear everything when test is complete
   if (isTestComplete) {
@@ -222,7 +226,7 @@ export default function Home() {
       <div className="min-h-screen bg-[#e8f1ff] p-8 font-serif">
         {/* Header */}
         <header className="flex flex-col sm:flex-row items-center sm:justify-between mb-6">
-          <img
+          <Image
             src="/logo.png"
             alt="IELTS Mastery Solutions Logo"
             className="h-28 w-28"
@@ -290,7 +294,7 @@ export default function Home() {
                   {/* Display image above reading material if available */}
                   {imageUrl && (
                     <div className={`mb-6 ${isBlurred ? "blur-sm" : ""}`}>
-                      <img
+                      <Image
                         src={imageUrl}
                         alt="Reading Material Visual"
                         className="max-w-full h-auto rounded-lg border border-gray-200 mx-auto"

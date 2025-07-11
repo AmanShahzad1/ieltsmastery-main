@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+/* eslint-disable react/no-unescaped-entities */
+import { useState, useEffect,useCallback } from "react";
 import {
   FaClock,
   FaHeadphones,
@@ -7,6 +8,7 @@ import {
   FaRedo,
   FaList,
   FaMicrophone,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   FaPlay,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
@@ -16,6 +18,7 @@ import { updateUserPerformance } from "../../../../api/performance";
 import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import axios from "axios";
 import Link from "next/link";
+import Image from 'next/image';
 
 export default function SpeakingTestPage() {
   // Existing state declarations (unchanged)
@@ -41,6 +44,7 @@ export default function SpeakingTestPage() {
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   // Add new state for evaluation results
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [evaluation, setEvaluation] = useState<{
     transcript: string;
     scores: Record<string, number>;
@@ -131,8 +135,12 @@ export default function SpeakingTestPage() {
        return false;
      }
    };
-   
-  const saveRecording = async (audioBlob: Blob) => {
+   const stopRecording = useCallback(() => {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+    }
+  },[mediaRecorder]);
+  const saveRecording = useCallback ( async (audioBlob: Blob) => {
     setIsEvaluating(true); // Start loading
     try {
       const formData = new FormData();
@@ -144,7 +152,7 @@ export default function SpeakingTestPage() {
         "http://localhost:5001/evaluate_speaking",
         formData
       );
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { transcript, evaluation, question } = response.data;
 
       console.log(response.data);
@@ -176,8 +184,33 @@ export default function SpeakingTestPage() {
       setIsEvaluating(false); // Stop loading regardless of success/error
       
     }
-  };
+  },[currentPart, questionNumber, questions, testId,updateTestPerformance]);
+const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
 
+      recorder.ondataavailable = async (event) => {
+        const audioBlob = new Blob([event.data], { type: "audio/wav" });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioUrl(url);
+        await saveRecording(audioBlob);
+      };
+
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        setRecording(false);
+        setTimerActive(false);
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setRecording(true);
+      setTimerActive(true);
+    } catch (error) {
+      console.error("Error accessing microphone", error);
+    }
+  },[saveRecording]);
   // End test handler (new from Listening Test)
   const endTest = async () => {
     const isConfirmed = confirm(
@@ -208,11 +241,11 @@ export default function SpeakingTestPage() {
         setIsLoading(false);
       }
     };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
     if (showQuestion) {
       loadQuestions();
     }
-  }, [showQuestion, currentPart]);
+  }, [showQuestion, currentPart,testId]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -221,10 +254,11 @@ export default function SpeakingTestPage() {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
     } else if (timeLeft === 0 && recording) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       stopRecording();
     }
     return () => clearInterval(timer);
-  }, [timerActive, timeLeft, recording]);
+  }, [timerActive, timeLeft, recording,stopRecording]);
 
   useEffect(() => {
     let countdownTimer: NodeJS.Timeout;
@@ -233,11 +267,12 @@ export default function SpeakingTestPage() {
         setCountdown((prev) => prev - 1);
       }, 1000);
     } else if (showCountdown && countdown === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       startRecording();
       setShowCountdown(false);
     }
     return () => clearInterval(countdownTimer);
-  }, [showCountdown, countdown]);
+  }, [showCountdown, countdown, startRecording]);
 
   useEffect(() => {
     if (showQuestion && questions.length > 0 && !recording && !audioUrl) {
@@ -282,44 +317,15 @@ export default function SpeakingTestPage() {
     setTimerActive(false);
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+  
 
-      recorder.ondataavailable = async (event) => {
-        const audioBlob = new Blob([event.data], { type: "audio/wav" });
-        const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
-        await saveRecording(audioBlob);
-      };
-
-      recorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-        setRecording(false);
-        setTimerActive(false);
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
-      setRecording(true);
-      setTimerActive(true);
-    } catch (error) {
-      console.error("Error accessing microphone", error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      mediaRecorder.stop();
-    }
-  };
+  
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-[#e8f1ff] p-8 font-serif flex flex-col items-center relative">
         {/* Existing UI elements (unchanged) */}
-        <img
+        <Image
           src="/logo.png"
           alt="IELTS Mastery Solutions Logo"
           className="h-36 w-36 absolute top-4 left-4"
