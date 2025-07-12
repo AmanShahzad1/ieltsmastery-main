@@ -19,6 +19,7 @@ export default function AdminListeningPage() {
     { type: string; question: string; answer: string }[]
   >([]);
   const [selectedPart, setSelectedPart] = useState<string>("Part 1");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const testId = searchParams.get("testId");
@@ -84,59 +85,60 @@ export default function AdminListeningPage() {
     }
   };
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      let finalAudioUrl = null;
-      let finalImageUrl = null;
+const handleSave = async () => {
+  setIsSaving(true);
+  try {
+    let finalAudioUrl = null;
+    let finalImageUrl = null;
 
-      // Upload audio if new file exists
-      if (audioFile) {
-        const audioFormData = new FormData();
-        audioFormData.append("audio", audioFile);
-        const audioRes = await axios.post(
-          `http://localhost:5000/api/tests/upload-audio`,
-          audioFormData
-        );
-        console.log("Audio Saved");
-        finalAudioUrl = audioRes.data.audioUrl;
-      }
-
-      // Upload image if new file exists
-      if (imageFile) {
-        const imageFormData = new FormData();
-        imageFormData.append("image", imageFile);
-        const imageResponse = await axios.post(
-          `http://localhost:5000/api/tests/upload-image`,
-          imageFormData
-        );
-        console.log("Image Saved");
-        finalImageUrl = imageResponse.data.imageUrl;
-      }
-
-      // Save all data
-      const saveResponse = await saveListeningData(
-        testId as string,
-        selectedPart,
-        questions,
-        finalAudioUrl,
-        finalImageUrl
+    // Upload audio if new file exists
+    if (audioFile) {
+      const audioFormData = new FormData();
+      audioFormData.append("audio", audioFile);
+      const audioRes = await axios.post(
+        `http://localhost:5000/api/tests/upload-audio`,
+        audioFormData
       );
-      await saveListeningTestType(testId as string, difficulty);
-      const res = await updatePlanWithTest(testId, difficulty, 'listening');  
-      if (res.success) console.log("Plan updated:", res.updatedPlans); 
-      if (!saveResponse.success) {
-        throw new Error(saveResponse.error || "Save failed");
-      }
-
-      alert("Saved successfully!");
-    } catch (error: any) {
-      console.error("Save error:", error);
-      alert(`Error: ${error.message || "Unknown error"}`);
-    } finally {
-      setIsSaving(false);
+      console.log("Audio Saved");
+      finalAudioUrl = audioRes.data.audioUrl;
     }
-  };
+
+    // Upload image if new file exists
+    if (imageFile) {
+      const imageFormData = new FormData();
+      imageFormData.append("image", imageFile);
+      const imageResponse = await axios.post(
+        `http://localhost:5000/api/tests/upload-image`,
+        imageFormData
+      );
+      console.log("Image Saved");
+      finalImageUrl = imageResponse.data.imageUrl;
+    }
+
+    // Save all data
+    const saveResponse = await saveListeningData(
+      testId as string,
+      selectedPart,
+      questions,
+      finalAudioUrl,
+      finalImageUrl
+    );
+    await saveListeningTestType(testId as string, difficulty);
+    const res = await updatePlanWithTest(testId, difficulty, 'listening');  
+    if (res.success) console.log("Plan updated:", res.updatedPlans); 
+    if (!saveResponse.success) {
+      throw new Error(saveResponse.error || "Save failed");
+    }
+
+    alert("Saved successfully!");
+  } catch (error: unknown) {
+    console.error("Save error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    alert(`Error: ${errorMessage}`);
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 font-serif">

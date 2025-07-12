@@ -10,6 +10,7 @@ import Link from "next/link";
 
 export default function ListeningTest() {
   const params = useParams();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [timeUsed, setTimeUsed] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(1800); // 30 minutes total for all parts
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -22,6 +23,7 @@ export default function ListeningTest() {
   const [imageUrl, setImageUrl] = useState<string | null>(null); // For fetched image URL
   const [hasStarted, setHasStarted] = useState(false); // Track if the test has started
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({}); // Track user answers by question ID
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const audioRef = useRef<HTMLAudioElement>(null);
   const [time, setTime] = useState(0);
   const testId = params.id as string;

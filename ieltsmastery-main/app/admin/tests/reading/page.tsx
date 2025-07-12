@@ -30,6 +30,7 @@ export default function AdminReadingPage() {
 
   useEffect(() => {
     if (testId && selectedPart) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fetchPartData(testId, selectedPart).then((data: any) => {
         const loadedQuestions: Question[] = data.questions || [];
         setQuestions(loadedQuestions);
@@ -50,7 +51,7 @@ export default function AdminReadingPage() {
         setReadingMaterial("");
         setImageUrl("");
       });
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
       fetchTestType(testId).then((data: any) => {
         if (data.type) setTestType(data.type);
         if (data.difficulty) setDifficulty(data.difficulty);

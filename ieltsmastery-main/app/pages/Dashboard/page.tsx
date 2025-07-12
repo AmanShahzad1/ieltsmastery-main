@@ -11,9 +11,12 @@ import ActivityCard from "../../../components/dashboard/ActivityCard";
 import styles from "./dashboard.module.css";
 
 const Dashboard: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
   const [username, setUsername] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [userId, setUserId] = useState<number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userPlan, setUserPlan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
