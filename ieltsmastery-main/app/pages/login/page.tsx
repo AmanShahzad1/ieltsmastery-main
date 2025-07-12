@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { MdFacebook } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
@@ -24,9 +23,7 @@ export default function LoginPage() {
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:5000/auth/google";
   };
-  const handleFacebookLogin = () => {
-    window.location.href = "http://localhost:5000/auth/facebook"; // Redirect to Facebook OAuth route
-  };
+
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

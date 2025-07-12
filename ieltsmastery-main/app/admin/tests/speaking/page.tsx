@@ -27,6 +27,7 @@ export default function AdminSpeakingPage() {
       fetchSpeakingData(testId, selectedPart)
         .then((data) => {
           setQuestions(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data.questions?.map((q: any) => ({
               question: q.question || "",
             })) || []

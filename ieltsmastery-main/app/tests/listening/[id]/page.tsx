@@ -24,6 +24,7 @@ export default function ListeningTest() {
   const [imageUrl, setImageUrl] = useState<string | null>(null); // For fetched image URL
   const [hasStarted, setHasStarted] = useState(false); // Track if the test has started
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: string }>({}); // Track user answers by question ID
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const audioRef = useRef<HTMLAudioElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [time, setTime] = useState(0);

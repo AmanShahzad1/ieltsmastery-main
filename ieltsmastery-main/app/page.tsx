@@ -1,6 +1,6 @@
 
 "use client";
-
+/* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
 import './styles/global.css';
 import Head from "next/head";
