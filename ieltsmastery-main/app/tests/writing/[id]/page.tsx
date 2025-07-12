@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { fetchWritingPartData, saveWritingAnswer, getFeedbackFromFlask, saveWritingLLMResponse} from "../../../../api/writing"; // Adjust the import path as needed
 import { updateUserPerformance } from "../../../../api/performance";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import axios from "axios"; // For error handling
 import { useParams } from "next/navigation";
-
+import Image from 'next/image';
 const WritingTest = () => {
   const params = useParams();
   const [wordCount, setWordCount] = useState(0);
@@ -22,9 +23,10 @@ const WritingTest = () => {
   const [fetchError, setFetchError] = useState<string | null>(null); // Error state
   const [taskType, setTaskType] = useState("Task 1"); // Track the current task (Task 1 or Task 2)
   const [hasStarted, setHasStarted] = useState(false); // Track if the test has started
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isBlurred, setIsBlurred] = useState(true);
 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   const searchParams = useSearchParams();
   const testId = params.id as string; // Fallback to "1" if testId is not provided
 
@@ -50,6 +52,7 @@ useEffect(() => {
         const data = await fetchWritingPartData(testId, taskType);
         setQuestions(data.questions || []);
         setImageUrl(data.material || null);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setFetchError("Failed to load the writing task. Please try again later.");
       } finally {
@@ -201,7 +204,7 @@ const startTest = () => {
         {/* Header */}
         <header className="flex flex-col sm:flex-row items-center sm:justify-between mb-6">
           <div className="flex items-center mb-4 sm:mb-0 sm:mr-4">
-            <img
+            <Image
               src="/logo.png"
               alt="IELTS Mastery Solutions Logo"
               className="h-28 w-28"
@@ -286,7 +289,7 @@ const startTest = () => {
 
                 {imageUrl && (
                   <div className="mt-4 flex justify-center">
-                    <img src={imageUrl} alt="Writing Task Image" className="max-w-full h-auto rounded-md" />
+                    <Image src={imageUrl} alt="Writing Task Image" className="max-w-full h-auto rounded-md" />
                   </div>
                 )}
               </div>
