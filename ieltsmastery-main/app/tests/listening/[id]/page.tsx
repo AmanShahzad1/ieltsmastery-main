@@ -8,6 +8,9 @@ import { fetchListeningData } from "../../../../api/listening"; // Use the same 
 import { updateUserPerformance } from "../../../../api/performance";
 import axios from "axios"; // Import axios for API calls
 import Link from "next/link";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' ;
+
+
 /* eslint-disable react/no-unescaped-entities */
 export default function ListeningTest() {
   const params = useParams();
@@ -118,7 +121,7 @@ export default function ListeningTest() {
       for (const question of questions) {
         const userAnswer = userAnswers[question.id] || ""; // Get the user's answer (default to empty string if not answered)
         await axios.post(
-          "http://localhost:5000/api/tests/saveListeningAnswer",
+          `${BASE_URL}/tests/saveListeningAnswer`,
           {
             testId: testId,
             questionId: question.id,

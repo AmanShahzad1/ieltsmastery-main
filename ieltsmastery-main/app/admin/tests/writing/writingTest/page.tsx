@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   saveWritingPartData,
@@ -11,7 +11,18 @@ import {
 import { updatePlanWithTest } from "../../../../../api/plans";
 import Link from "next/link";
 
+
 export default function AdminWritingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminWritingPageContent />
+    </Suspense>
+  );
+}
+
+
+
+function AdminWritingPageContent() {
   const [questions, setQuestions] = useState<{ question: string }[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Task 1");
   const [imageFile, setImageFile] = useState<File | null>(null);

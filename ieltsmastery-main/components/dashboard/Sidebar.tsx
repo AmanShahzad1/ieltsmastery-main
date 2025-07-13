@@ -3,9 +3,15 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
 
+interface UserPlan {
+  id: number;
+  // Add other properties that userPlan might have
+  [key: string]: unknown; // For any additional dynamic properties
+}
+
 interface SidebarProps {
   username: string;
-  userPlan: any;
+  userPlan: UserPlan;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -20,6 +26,7 @@ interface NavigationItem {
 
 const Sidebar: React.FC<SidebarProps> = ({ 
   username, 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userPlan, 
   isOpen, 
   setIsOpen 

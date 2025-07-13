@@ -8,6 +8,8 @@ import { useParams } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Image from 'next/image';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' ;
+
 
 /* eslint-disable react/no-unescaped-entities */
 export default function Home() {
@@ -107,7 +109,7 @@ export default function Home() {
       const userId = decoded.userId;
       for (const question of questions) {
         if (userAnswers[question.id]) {
-          await axios.post("http://localhost:5000/api/tests/saveUserAnswer", {
+          await axios.post(`${BASE_URL}/tests/saveUserAnswer`, {
             testId: testId,
             questionId: question.id,
             userAnswer: userAnswers[question.id],

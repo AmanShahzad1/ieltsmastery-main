@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   fetchListeningData,
@@ -11,8 +11,28 @@ import { updatePlanWithTest } from "../../../../api/plans";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' ;
 
+
+// Define types for the question objects
+// interface Question {
+//   type: string;
+//   question: string;
+//   answer: string;
+// }
+
+
+// Main component wrapped in Suspense
 export default function AdminListeningPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminListeningContent />
+    </Suspense>
+  );
+}
+
+
+function AdminListeningContent() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [questions, setQuestions] = useState<
@@ -96,7 +116,7 @@ const handleSave = async () => {
       const audioFormData = new FormData();
       audioFormData.append("audio", audioFile);
       const audioRes = await axios.post(
-        `http://localhost:5000/api/tests/upload-audio`,
+        `${BASE_URL}/tests/upload-audio`,
         audioFormData
       );
       console.log("Audio Saved");
@@ -108,7 +128,7 @@ const handleSave = async () => {
       const imageFormData = new FormData();
       imageFormData.append("image", imageFile);
       const imageResponse = await axios.post(
-        `http://localhost:5000/api/tests/upload-image`,
+        `${BASE_URL}/tests/upload-image`,
         imageFormData
       );
       console.log("Image Saved");

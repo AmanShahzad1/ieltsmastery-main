@@ -4,8 +4,7 @@ import { FaGoogle } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 // import { useRouter } from 'next/navigation';
-
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' ;
 
 
 export default function LoginPage() {
@@ -25,7 +24,7 @@ export default function LoginPage() {
 
   
   const handleGoogleLogin =()=>{
-    window.location.href = 'http://localhost:5000/auth/google';
+    window.location.href = `${BASE_URL}/auth/google`;
   }
 
   
@@ -35,7 +34,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

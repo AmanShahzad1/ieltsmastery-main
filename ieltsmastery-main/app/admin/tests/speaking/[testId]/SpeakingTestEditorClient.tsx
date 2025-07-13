@@ -1,79 +1,81 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useParams, useRouter } from "next/navigation";
 import {
   fetchSpeakingData,
   saveSpeakingData,
   fetchSpeakingTestType,
   saveSpeakingTestType,
-} from "../../../../api/speaking";
-import { updatePlanWithTest } from "../../../../api/plans";
+} from "../../../../../api/speaking";
+import { updatePlanWithTest } from "../../../../../api/plans";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function AdminSpeakingPage() {
-  const [questions, setQuestions] = useState<{ question: string }[]>([]);
-  const [selectedPart, setSelectedPart] = useState<string>("Part 1");
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const searchParams = useSearchParams();
-  const testId = searchParams.get("testId");
+interface Question {
+  question: string;
+}
 
-  // NEW STATE ONLY
-  const [difficulty, setDifficulty] = useState<string>("Intermediate");
+export default function SpeakingTestEditorClient() {
+  const { testId } = useParams();
+//   const router = useRouter();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [selectedPart, setSelectedPart] = useState("Part 1");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [difficulty, setDifficulty] = useState("Intermediate");
 
   useEffect(() => {
-    if (testId && selectedPart) {
-      fetchSpeakingData(testId, selectedPart)
-        .then((data) => {
-          setQuestions(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            data.questions?.map((q: any) => ({
-              question: q.question || "",
-            })) || []
-          );
-        })
-        .catch((error) => {
-          console.error("Failed to fetch part data:", error);
-          setQuestions([]);
-        });
-      // NEW: Separate call for type/difficulty (non-blocking)
-      fetchSpeakingTestType(testId)
-        .then((data) => {
-          if (data.difficulty) setDifficulty(data.difficulty);
-        })
-        .catch(() => {});
-    }
+    if (!testId) return;
+
+    const loadData = async () => {
+      try {
+        const [testData, typeData] = await Promise.all([
+          fetchSpeakingData(testId as string, selectedPart),
+          fetchSpeakingTestType(testId as string)
+        ]);
+
+        setQuestions(
+          testData.questions?.map((q: Question) => ({ question: q.question || "" })) || []
+        );
+
+        if (typeData.difficulty) {
+          setDifficulty(typeData.difficulty);
+        }
+      } catch (error) {
+        console.error("Error loading test data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
   }, [testId, selectedPart]);
 
   const handlePartSelection = (part: string) => {
-    if (part !== selectedPart) {
-      setSelectedPart(part);
-    }
+    setSelectedPart(part);
   };
 
   const handleAddQuestion = () => {
     setQuestions([...questions, { question: "" }]);
   };
-  
 
   const handleSave = async () => {
     if (!testId) return;
 
     setIsSaving(true);
     try {
-      const response = await saveSpeakingData(testId, selectedPart, questions);
-      // NEW: Save type/difficulty (non-blocking)
+      const response = await saveSpeakingData(testId as string, selectedPart, questions);
       await saveSpeakingTestType(testId as string, difficulty);
-      const res = await updatePlanWithTest(testId, difficulty, 'speaking');  
-      if (res.success) console.log("Plan updated:", res.updatedPlans);
+      await updatePlanWithTest(testId as string, difficulty, 'speaking');
+      
       if (!response.success) {
         throw new Error(response.message || "Save failed");
       }
       alert("Speaking test saved successfully!");
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       console.error("Save error:", error);
       alert(`Error: ${errorMessage}`);
     } finally {
@@ -81,7 +83,15 @@ export default function AdminSpeakingPage() {
     }
   };
 
-  return (
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
+        <div className="text-xl">Loading test editor...</div>
+      </div>
+    );
+  }
+
+return (
     <div className="min-h-screen bg-gray-100 p-8 font-serif">
       <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
         <div className="flex items-center mr-6 sm:mr-4">
@@ -98,7 +108,7 @@ export default function AdminSpeakingPage() {
           Admin Speaking Test
         </h1>
       </header>
-      {/* ONLY NEW UI ADDITION */}
+
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <div>
@@ -117,7 +127,7 @@ export default function AdminSpeakingPage() {
           </div>
         </div>
       </div>
-      {/* Part Selection - Same as Listening */}
+
       <div className="bg-white shadow-md rounded-md p-4 mb-6">
         <h3 className="text-lg font-bold mb-4 text-center">Select Part</h3>
         <div className="flex justify-center space-x-4">
@@ -135,7 +145,6 @@ export default function AdminSpeakingPage() {
         </div>
       </div>
 
-      {/* Question Management - Simplified */}
       <div className="bg-white shadow-md rounded-md p-6">
         <h3 className="text-lg font-bold mb-4">Questions</h3>
         <button
@@ -171,7 +180,6 @@ export default function AdminSpeakingPage() {
         </div>
       </div>
 
-      {/* Consistent Save/Cancel Buttons */}
       <div className="flex justify-center mt-8">
         <button
           onClick={handleSave}

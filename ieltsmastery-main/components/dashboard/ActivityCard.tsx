@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./dashboard.module.css";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' ;
 
 interface PerformanceData {
   test_type: string;
@@ -23,7 +24,7 @@ const ActivityCard: React.FC = () => {
         if (token) {
           const decoded = jwtDecode<{ userId: number }>(token);
           const response = await axios.get(
-            `http://localhost:5000/api/performance/user-performance/${decoded.userId}`
+            `${BASE_URL}/performance/user-performance/${decoded.userId}`
           );
           console.log("API Response:", response.data); // Debug log
           setPerformanceData(response.data);

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { registerUserProfile } from "@/api/auth";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api' ;
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -51,7 +53,7 @@ export default function RegisterPage() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:5000/api/tests/upload-image", {
+      const response = await fetch(`${BASE_URL}/tests/upload-image`, {
         method: "POST",
         body: formData
       });

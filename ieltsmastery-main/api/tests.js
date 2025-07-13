@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api"; // Backend base URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"; // Backend base URL
 
 //------------------------------
 //fetch starting test
@@ -42,7 +42,7 @@ export const submitStartingTestAnswer = async (uId, questionId, answer) => {
 
 export const fetchTests = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/tests");
+      const response = await fetch(`${BASE_URL}/tests`);
       if (!response.ok) {
         throw new Error("Failed to fetch tests");
       }
@@ -56,7 +56,7 @@ export const fetchTests = async () => {
   // In your `createTest` function (frontend):
 export const createTest = async (testName) => {
     try {
-      const response = await fetch("http://localhost:5000/api/tests/create", {
+      const response = await fetch(`${BASE_URL}/tests/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
