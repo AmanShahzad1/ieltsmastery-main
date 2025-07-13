@@ -1,10 +1,10 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:5000/api/tests";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 //create a speaking test
 export const createSpeakingTest = async (testName) => {
     try {
         //debugger;
-      const response = await fetch("http://localhost:5000/api/tests/speaking/create", {
+      const response = await fetch(`${BASE_URL}/tests/speaking/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export const createSpeakingTest = async (testName) => {
   export const fetchSpeakingTests = async () => {
     //debugger;
     try {
-      const response = await fetch("http://localhost:5000/api/tests/speaking/tests",
+      const response = await fetch(`${BASE_URL}/tests/speaking/tests`,
         {method: "GET",});
       
       if (!response.ok) {
@@ -47,7 +47,7 @@ export const createSpeakingTest = async (testName) => {
 export const fetchSpeakingData = async (testId, partName) => {
   try {
     console.log("Fetching speaking test data:", testId);
-    const response = await axios.get(`${BASE_URL}/speaking/${testId}/${partName}`);
+    const response = await axios.get(`${BASE_URL}/tests/speaking/${testId}/${partName}`);
     console.log("Speaking test data fetched successfully:", response.data);
     return response.data || { questions: [] }; // Return an empty list if no questions exist
   } catch (error) {
@@ -58,7 +58,7 @@ export const fetchSpeakingData = async (testId, partName) => {
 export const saveSpeakingData = async (testId, partName, questions) => {
   try {
     console.log("Saving speaking test data:", testId, partName, questions);
-    const response = await axios.post(`${BASE_URL}/speaking/${testId}/${partName}`, {
+    const response = await axios.post(`${BASE_URL}/tests/speaking/${testId}/${partName}`, {
       questions 
     });
     console.log("Speaking test data saved successfully:", response.data);
@@ -72,7 +72,7 @@ export const saveSpeakingData = async (testId, partName, questions) => {
 export const saveSpeakingAnswer = useCallback(async ({ testId, questionId, userAnswer, score, feedback, userId }) => {
     try {
       console.log("Trying to save", testId, questionId, userAnswer, score, feedback, userId)
-      const response = await axios.post(`${BASE_URL}/speaking/saveSpeakingAnswer`, {
+      const response = await axios.post(`${BASE_URL}/tests/speaking/saveSpeakingAnswer`, {
         testId,
         questionId,
         userAnswer,
@@ -91,7 +91,7 @@ export const fetchSpeakingTestType = async (testId) => {
 
   try {
     console.log("Frontend Received", testId);
-    const response = await axios.get(`${BASE_URL}/speakingType/${testId}`);
+    const response = await axios.get(`${BASE_URL}/tests/speakingType/${testId}`);
     console.log("Response", response);
     return response.data; // Return the data from the response
   } catch (error) {
@@ -107,7 +107,7 @@ export const fetchSpeakingTestType = async (testId) => {
 export const saveSpeakingTestType = async (testId, difficulty) => {
   try {
  
-    const response = await axios.post(`${BASE_URL}/speakingType/${testId}`, {
+    const response = await axios.post(`${BASE_URL}/tests/speakingType/${testId}`, {
       testId,
       difficulty
     });

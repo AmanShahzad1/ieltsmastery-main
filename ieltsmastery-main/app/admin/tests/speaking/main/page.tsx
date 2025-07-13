@@ -1,110 +1,19 @@
-"use client"; // Mark the component as a client component
+"use client"
+import dynamic from 'next/dynamic';
+import React from 'react';
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link"; // Use next/link for client-side navigation
-import {createSpeakingTest,fetchSpeakingTests}from "../../../../../api/speaking"; 
-import Image from "next/image";
-// Import API functions
-// Define the structure of a test object
-interface Test {
-  id: number;
-  name: string;
-}
-
-export default function SpeakingTestMainPage() {
-  const [tests, setTests] = useState<Test[]>([]); // Set initial state as an empty array of Test type
-
-  // Fetch the list of tests from the backend
-  const getTests = async () => {
-    try {
-      const fetchedTests = await fetchSpeakingTests(); // Fetch tests from the API
-      setTests(fetchedTests); // Store fetched tests in the state
-    } catch (error) {
-      console.error("Error fetching tests:", error);
-    }
-  };
-
-  // Fetch tests when the component mounts
-  useEffect(() => {
-    getTests();
-  }, []);
-
-  // Handle the creation of a new test
-  const handleCreateTest = async () => {
-    try {
-      const newTest = await createSpeakingTest(`Speaking ${tests.length + 1}`); // Create new test
-      if (newTest && newTest.id && newTest.name) {
-        // Ensure the new test has the correct structure
-        setTests((prevTests) => [...prevTests, newTest]); // Add the newly created test to the state
-      } else {
-        console.error("Invalid test structure returned", newTest);
-      }
-    } catch (error) {
-      console.error("Error creating test:", error);
-    }
-  };
-//debugger;
-  return (
-    <div className="min-h-screen bg-gray-100 p-8 font-serif">
-      {/* Header */}
-      <header className="flex items-center mb-6 flex-col sm:flex-row sm:justify-between">
-        <div className="flex items-center mr-6 sm:mr-4">
-        <Image
-          src="/logo.png"
-          alt="IELTS Mastery Solutions Logo"
-          width={112}
-          height={112}
-          className="h-28 w-28"
-        />
-        </div>
-        <h1 className="text-2xl font-bold sm:ml-4 mt-4 sm:mt-0 text-center w-full">
-          Speaking Tests
-        </h1>
-      </header>
-
-      {/* Main Content */}
-      <div className="bg-white shadow-md rounded-md p-6">
-        <h2 className="text-lg font-bold mb-6">All Speaking Tests</h2>
-
-        {/* List of Speaking Tests */}
-        <div className="space-y-4">
-          {tests.map((test)  => (
-            <div
-              key={test.id}
-              className="flex justify-between items-center p-4 border border-gray-300 rounded-md bg-gray-50"
-            >
-              <span className="text-lg">{test.name}</span>
-              <Link
-                href={{
-                  pathname: "/admin/tests/speaking",
-                  query: { testId: test.id.toString() }, // Pass testId as a query parameter
-                }}
-              >
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-                  View Test
-                </button>
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        {/* Create Test Button */}
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={handleCreateTest}
-            className="px-6 py-3 bg-[#03036D] text-white text-lg font-bold rounded-md hover:bg-[#020258]"
-          >
-            Create Test
-          </button>
-        </div>
-
-        {/* Back Button */}
-        <div className="flex justify-center mt-8">
-          <Link href="/admin/home" className="px-6 py-3 bg-gray-500 text-white text-lg font-bold rounded-md hover:bg-gray-600">
-              Go Back
-          </Link>
-        </div>
+const SpeakingTestMainView = dynamic(
+  () => import('./SpeakingTestMainClient'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
       </div>
-    </div>
-  );
+    )
+  }
+);
+
+export default function Page() {
+  return <SpeakingTestMainView />;
 }

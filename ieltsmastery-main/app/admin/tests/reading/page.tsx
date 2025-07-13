@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { fetchPartData, savePartData, fetchTestType, saveTestType } from "../../../../api/tests";
 import { updatePlanWithTest } from "../../../../api/plans";
@@ -15,6 +15,15 @@ interface Question {
 }
 
 export default function AdminReadingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminReadingPageContent />
+    </Suspense>
+  );
+}
+
+
+function AdminReadingPageContent() {
   const [readingMaterial, setReadingMaterial] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedPart, setSelectedPart] = useState<string>("Part 1");

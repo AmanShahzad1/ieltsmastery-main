@@ -6,10 +6,17 @@ import HamburgerMenu from "./HamburgerMenu";
 import Sidebar from "./Sidebar";
 import MainContent from "./MainContent";
 
+interface UserPlan {
+  id: number;
+  // Add other properties that userPlan might have
+  [key: string]: unknown; // For any additional dynamic properties
+}
+
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
   username: string;
-  userPlan: any;
+  userPlan: UserPlan;
   loading: boolean;
 }
 

@@ -7,8 +7,21 @@ import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import Image from 'next/image';
 
+interface Question {
+  question_id: number;
+  question: string;
+  option1: string;
+  option2: string;
+  option3: string;
+  option4: string;
+}
+
+interface DecodedToken {
+  userId: number;
+}
+
 const StartTest = () => {
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isStarted, setIsStarted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -23,7 +36,7 @@ const StartTest = () => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const decoded = jwtDecode<{ userId: number }>(token);
+          const decoded = jwtDecode<DecodedToken>(token);
           setUserId(decoded.userId);
         } catch (error) {
           console.error("Error decoding token:", error);
@@ -53,7 +66,7 @@ const StartTest = () => {
     }
   };
 
-  const calculateLevel = () => {
+  const calculateLevel = (): string => {
     const answerValues = Object.values(answers);
     const advancedCount = answerValues.filter(a => a === "Advanced" || a === "Fluent/Native").length;
     const intermediateCount = answerValues.filter(a => a === "Intermediate").length;
@@ -74,7 +87,6 @@ const StartTest = () => {
       const response = await assignPlanToUser(userId, level);
       console.log('Plan assigned:', response);
       
-      // Optional: Fetch the assigned plan details
       const planDetails = await getUserPlan(userId);
       console.log('User plan details:', planDetails);
       
@@ -92,21 +104,18 @@ const StartTest = () => {
     try {
       setIsSubmitting(true);
       
-      // Save answer locally first
       const newAnswers = {
         ...answers,
         [currentQuestion.question_id]: selectedOption
       };
       setAnswers(newAnswers);
 
-      // Submit to backend
       await submitStartingTestAnswer(
         userId,
         currentQuestion.question_id,
         selectedOption
       );
 
-      // Move to next question or complete
       if (currentQuestionIndex + 1 < questions.length) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
@@ -158,7 +167,7 @@ const StartTest = () => {
       <div className="min-h-screen bg-blue-50 flex flex-col p-6">
         <div className="flex justify-start items-center mb-12">
           <div className="flex items-center space-x-2">
-            <Image src="/logo.png" alt="Logo" className="h-16 w-auto" />
+            <Image src="/logo.png" alt="Logo" width={64} height={64} className="h-16 w-auto" />
             <h1 className="text-2xl font-bold text-gray-800">IELTS Placement Test</h1>
           </div>
         </div>
@@ -201,7 +210,7 @@ const StartTest = () => {
     <div className="min-h-screen bg-blue-50 flex flex-col p-6">
       <div className="flex justify-start items-center mb-12">
         <div className="flex items-center space-x-2">
-          <Image src="/logo.png" alt="Logo" className="h-16 w-auto" />
+          <Image src="/logo.png" alt="Logo" width={64} height={64} className="h-16 w-auto" />
           <h1 className="text-2xl font-bold text-gray-800">IELTS Placement Test</h1>
         </div>
       </div>

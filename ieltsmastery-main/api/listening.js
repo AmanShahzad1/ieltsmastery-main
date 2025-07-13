@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/tests";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 // ✅ Fetch Listening Test Data
 export const fetchListeningData = async (testId, partName) => {
   try {
     console.log("Fetching the data frontend", testId, partName);
-    const response = await axios.get(`${BASE_URL}/listening/${testId}/${partName}`);
+    const response = await axios.get(`${BASE_URL}//tests/listening/${testId}/${partName}`);
     console.log("Data fetched successfully", response.data);
     return response.data;
   } catch (error) {
@@ -51,7 +51,7 @@ export const fetchListeningData = async (testId, partName) => {
 export const saveListeningData = async (testId, partName, questions, audioUrl, imageUrl) => {
   try {
     // Save everything in DB
-    const response = await axios.post(`${BASE_URL}/listening/${testId}/${partName}`, {
+    const response = await axios.post(`${BASE_URL}/tests/listening/${testId}/${partName}`, {
       questions,
       audioUrl,
       imageUrl
@@ -66,7 +66,7 @@ export const saveListeningData = async (testId, partName, questions, audioUrl, i
 
 export const fetchListeningTests = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/tests/listening/tests");
+      const response = await fetch(`${BASE_URL}/tests/listening/tests`);
       if (!response.ok) {
         throw new Error("Failed to fetch tests");
       }
@@ -80,7 +80,7 @@ export const fetchListeningTests = async () => {
   // In your `createTest` function (frontend):
 export const createListeningTest = async (testName) => {
     try {
-      const response = await fetch("http://localhost:5000/api/tests/listening/create", {
+      const response = await fetch(`${BASE_URL}/tests/listening/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const fetchListeningTestType = async (testId) => {
 
   try {
     console.log("Frontend Received", testId);
-    const response = await axios.get(`${BASE_URL}/listeningType/${testId}`);
+    const response = await axios.get(`${BASE_URL}/tests/listeningType/${testId}`);
     console.log("Response", response);
     return response.data; // Return the data from the response
   } catch (error) {
@@ -121,7 +121,7 @@ export const fetchListeningTestType = async (testId) => {
 export const saveListeningTestType = async (testId, difficulty) => {
   try {
  
-    const response = await axios.post(`${BASE_URL}/listeningType/${testId}`, {
+    const response = await axios.post(`${BASE_URL}/tests/listeningType/${testId}`, {
       testId,
       difficulty
     });

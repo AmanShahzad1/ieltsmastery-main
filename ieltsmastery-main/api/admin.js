@@ -1,6 +1,7 @@
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000/api' ;
 export const loginAdmin = async (username, password) => {
     try {
-      const response = await fetch("http://localhost:5000/api/admin/login", {
+      const response = await fetch(`${BASE_URL}/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -23,7 +24,7 @@ export const loginAdmin = async (username, password) => {
 //get all users
 export const getAllUsers = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/admin/all_users", {
+      const response = await fetch(`${BASE_URL}/admin/all_users`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export const getAllUsers = async () => {
   
 export const deleteUserById = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/delete_user/${id}`, {
+      const response = await fetch(`${BASE_URL}/admin/delete_user/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

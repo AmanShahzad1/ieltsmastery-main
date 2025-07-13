@@ -19,6 +19,8 @@ import ProtectedRoute from "@/app/pages/RouteProtected/RouteProtected";
 import axios from "axios";
 import Link from "next/link";
 import Image from 'next/image';
+const API_URL = process.env.NEXT_PUBLIC_LLM_URL || 'http://localhost:5001' ;
+
 
 export default function SpeakingTestPage() {
   // Existing state declarations (unchanged)
@@ -149,7 +151,7 @@ export default function SpeakingTestPage() {
       formData.append("part", currentPart);
 
       const response = await axios.post(
-        "http://localhost:5001/evaluate_speaking",
+        `${API_URL}/evaluate_speaking`,
         formData
       );
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

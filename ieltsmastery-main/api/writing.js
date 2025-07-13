@@ -1,11 +1,12 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api"; // Backend base URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"; // Backend base URL
+const API_URL = process.env.NEXT_PUBLIC_LLM_URL || 'http://localhost:5001' ;
 
 
   export const fetchWritingTests = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/tests/writing");
+      const response = await fetch(`${BASE_URL}/tests/writing`);
       if (!response.ok) {
         throw new Error("Failed to fetch tests");
       }
@@ -18,7 +19,7 @@ const BASE_URL = "http://localhost:5000/api"; // Backend base URL
 
   export const createWritingTest = async (testName) => {
     try {
-      const response = await fetch("http://localhost:5000/api/tests/createwriting", {
+      const response = await fetch(`${BASE_URL}/tests/createwriting`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export const saveWritingLLMResponse = async ({ testId, questionId, feedback, par
   //Flask api
 export const getFeedbackFromFlask = async (userAnswer) => {
     try {
-      const response = await fetch(`http://localhost:5001/chatbot?question=${encodeURIComponent(userAnswer)}`);
+      const response = await fetch(`${API_URL}/chatbot?question=${encodeURIComponent(userAnswer)}`);
       if (!response.ok) {
         throw new Error("Failed to fetch feedback from Flask backend");
       }
