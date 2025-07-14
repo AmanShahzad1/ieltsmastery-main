@@ -1,12 +1,12 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: "standalone", // Required for Vercel (SSR/ISR)
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
   },
-  // ... your other config
-}
+};
 
-export default nextConfig
+export default nextConfig;
